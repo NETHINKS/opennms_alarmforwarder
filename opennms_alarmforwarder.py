@@ -12,10 +12,19 @@ def main():
     # get alarms from OpenNMS
     alarms = receiver.get_alarms()
 
-    # test: save alarms
+    # save alarms in active_alarm database table
     orm_session = model.Session()
-    for alarm in alarms:
-        orm_session.add(alarm)
+    query_saved_alarms = orm_session.query(model.ActiveAlarm)
+    # add/update alarms to/in database table
+    for alarm_id in alarms:
+        alarm = alarms[alarm_id]
+        orm_session.merge(alarm)
+    # remove non existing alarms from database table
+    for saved_alarm in query_saved_alarms.all():
+        try:
+            alarms[str(saved_alarm.alarm_id)]
+        except:
+            orm_session.delete(saved_alarm)
     orm_session.commit()
 
     # only test data at the moment

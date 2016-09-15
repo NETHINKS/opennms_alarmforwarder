@@ -13,10 +13,10 @@ class OpennmsReceiver(object):
         self.__config = config
 
     def get_alarms(self):
-        """Get all alarms from OpenNMS and return a list with
-        model.ActiveAlarm objects
+        """Get all alarms from OpenNMS and return a map with
+        alarm_id -> model.ActiveAlarm objects
         """
-        alarms = []
+        alarms = {}
 
         # config
         config_rest_url = "https://demo.opennms.org/opennms/rest"
@@ -81,7 +81,7 @@ class OpennmsReceiver(object):
                 alarm_description=alarm_description,
                 alarm_operinstruct=alarm_operinstruct
             )
-            alarms.append(created_alarm)
+            alarms[alarm_id] = created_alarm
 
-        # return alarm list
+        # return alarm map
         return alarms
