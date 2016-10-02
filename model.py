@@ -2,7 +2,7 @@
 """
 
 from sqlalchemy import create_engine
-from sqlalchemy import ForeignKey, Column, Integer, String
+from sqlalchemy import ForeignKey, Column, Integer, String, DateTime
 from sqlalchemy.types import Boolean
 from sqlalchemy.orm import relationship, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
@@ -18,7 +18,7 @@ class ActiveAlarm(Base):
 
     alarm_id = Column(Integer, primary_key=True)
     alarm_uei = Column(String)
-    alarm_timestamp = Column(String)
+    alarm_timestamp = Column(DateTime)
     alarm_severity = Column(String)
     alarm_node_label = Column(String)
     alarm_node_interface = Column(String)
@@ -26,6 +26,8 @@ class ActiveAlarm(Base):
     alarm_logmsg = Column(String)
     alarm_description = Column(String)
     alarm_operinstruct = Column(String)
+
+    forwarding_entries = relationship("ForwardedAlarm", cascade="all, delete-orphan")
 
 
 class ForwardingRule(Base):
@@ -36,6 +38,8 @@ class ForwardingRule(Base):
     rule_match = Column(String)
     rule_target = Column(String)
     rule_target_parm = Column(String)
+
+    forwarding_entries = relationship("ForwardedAlarm", cascade="all, delete-orphan")
 
 
 class ForwardedAlarm(Base):

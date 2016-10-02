@@ -1,0 +1,72 @@
+"""Scheduler module
+
+This module defines the scheduler part of opennms_alarmforwarder
+"""
+
+import datetime
+import time
+import model
+from model import ActiveAlarm
+from model import ForwardedAlarm
+from sqlalchemy.sql import exists
+
+class Scheduler(object):
+
+    def __init__(self, config, receiver):
+        self.__config = config
+        self.__receiver = receiver
+
+    def run(self):
+        # scheduling loop
+        while True:
+            #get alarms from OpenNMS
+            alarms_onms = self.__receiver.get_alarms()
+
+            # save alarms in active_alarm database table
+            orm_session = model.Session()
+            query_saved_alarms = orm_session.query(model.ActiveAlarm)
+            # add/update alarms to/in database table
+            for alarm_id in alarms_onms:
+                alarm = alarms_onms[alarm_id]
+                orm_session.merge(alarm)
+            # remove non existing alarms from database table
+            for alarm_saved in query_saved_alarms.all():
+                try:
+                    alarms_onms[str(alarm_saved.alarm_id)]
+                except:
+                    orm_session.delete(alarm_saved)
+                    # ToDo: send resolved message
+            orm_session.commit()
+
+            # walk through all active alarms, that are not forwarded yet
+            query_filter = ~exists().where(ForwardedAlarm.alarm_id==ActiveAlarm.alarm_id)
+            query_non_forwarded_alarms = orm_session.query(ActiveAlarm).filter(query_filter)
+            for alarm_saved in query_non_forwarded_alarms.all():
+                # ToDo: check rule
+                if True:
+                    # create forwarding
+                    forwarded_alarm = ForwardedAlarm(
+                        alarm_id=alarm_saved.alarm_id,
+                        rule_id=1,
+                        forwarded=False
+                    )
+                    orm_session.add(forwarded_alarm)
+            orm_session.commit()
+
+            # walk through all forwardings, that were not executed yet
+            query_forwarding_alarms = orm_session.query(ForwardedAlarm, ActiveAlarm).\
+                                      filter(ForwardedAlarm.forwarded==False).\
+                                      filter(ForwardedAlarm.alarm_id==ActiveAlarm.alarm_id)
+            for alarm_forwarding, alarm_active in query_forwarding_alarms.all():
+                # check forwarding of alarms
+                time_diff_obj = datetime.datetime.now() - alarm_active.alarm_timestamp
+                time_diff_sec = time_diff_obj.days * 86400 + time_diff_obj.seconds
+                if time_diff_sec >= 300:
+                    # set forwarded flag
+                    alarm_forwarding.forwarded=True
+                    # ToDo: forward alarm
+            orm_session.commit()
+
+
+            # wait time limit for the next scheduler run
+            time.sleep(30)
