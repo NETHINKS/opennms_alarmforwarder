@@ -29,6 +29,13 @@ class ActiveAlarm(Base):
 
     forwarding_entries = relationship("ForwardedAlarm", cascade="all, delete-orphan")
 
+    def __str__(self):
+        output = "ID: " + str(self.alarm_id)
+        output += " UEI: " + self.alarm_uei
+        output += " Time: " + str(self.alarm_timestamp)
+        output += " Logmessage: " + self.alarm_logmsg
+        return output
+
 
 class ForwardingRule(Base):
 
@@ -36,10 +43,10 @@ class ForwardingRule(Base):
 
     rule_id = Column(Integer, primary_key=True)
     rule_match = Column(String)
-    rule_target = Column(String)
-    rule_target_parm = Column(String)
+    rule_target = Column(String, ForeignKey("target.target_name"))
 
     forwarding_entries = relationship("ForwardedAlarm", cascade="all, delete-orphan")
+    target = relationship("Target")
 
 
 class ForwardedAlarm(Base):
@@ -53,6 +60,7 @@ class ForwardedAlarm(Base):
     alarm = relationship("ActiveAlarm")
     rule = relationship("ForwardingRule")
 
+
 class ConfigEntry(Base):
 
     __tablename__ = "config"
@@ -60,3 +68,27 @@ class ConfigEntry(Base):
     config_section = Column(String, primary_key=True)
     config_key = Column(String, primary_key=True)
     config_value = Column(String)
+
+
+class Target(Base):
+
+    __tablename__ = "target"
+
+    target_name = Column(String, primary_key=True)
+    target_class = Column(String)
+    target_parms = relationship("TargetParameter", cascade="all, delete-orphan")
+
+    forwarding_rules = relationship("ForwardingRule", cascade="all, delete-orphan")
+
+
+class TargetParameter(Base):
+
+    __tablename__ = "target_parm"
+
+    target_name = Column(String, ForeignKey("target.target_name"), primary_key=True)
+    parameter_name = Column(String, primary_key=True)
+    parameter_value = Column(String)
+
+    target = relationship("Target")
+
+

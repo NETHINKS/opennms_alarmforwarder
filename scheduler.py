@@ -11,6 +11,7 @@ from model import ActiveAlarm
 from model import ForwardedAlarm
 from model import ForwardingRule
 from rulematching import RuleEvaluator
+from forwarder import Forwarder
 
 class Scheduler(object):
 
@@ -39,8 +40,14 @@ class Scheduler(object):
                 try:
                     alarms_onms[str(alarm_saved.alarm_id)]
                 except:
+                    # resolve forwarded alarms
+                    for forwarding_entry in alarm_saved.forwarding_entries:
+                        if forwarding_entry.forwarded:
+                            target = forwarding_entry.rule.target
+                            forwarder = Forwarder.create_forwarder(target.target_name, target.target_class, target.target_parms)
+                            forwarder.resolve_alarm(alarm_saved)
+                    # remove alarm
                     orm_session.delete(alarm_saved)
-                    # ToDo: send resolved message
             orm_session.commit()
 
             # walk through all active alarms, that are not forwarded yet
@@ -69,9 +76,12 @@ class Scheduler(object):
                 time_diff_obj = datetime.datetime.now() - alarm_active.alarm_timestamp
                 time_diff_sec = time_diff_obj.days * 86400 + time_diff_obj.seconds
                 if time_diff_sec >= 300:
+                    # forward alarm
+                    target = alarm_forwarding.rule.target
+                    forwarder = Forwarder.create_forwarder(target.target_name, target.target_class, target.target_parms)
+                    forwarder.forward_alarm(alarm_active)
                     # set forwarded flag
                     alarm_forwarding.forwarded=True
-                    # ToDo: forward alarm
             orm_session.commit()
 
 
