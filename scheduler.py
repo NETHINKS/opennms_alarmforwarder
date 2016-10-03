@@ -5,10 +5,12 @@ This module defines the scheduler part of opennms_alarmforwarder
 
 import datetime
 import time
+from sqlalchemy.sql import exists
 import model
 from model import ActiveAlarm
 from model import ForwardedAlarm
-from sqlalchemy.sql import exists
+from model import ForwardingRule
+from rulematching import RuleEvaluator
 
 class Scheduler(object):
 
@@ -17,6 +19,9 @@ class Scheduler(object):
         self.__receiver = receiver
 
     def run(self):
+        # create onjects
+        rule_evaluator = RuleEvaluator()
+
         # scheduling loop
         while True:
             #get alarms from OpenNMS
@@ -41,16 +46,18 @@ class Scheduler(object):
             # walk through all active alarms, that are not forwarded yet
             query_filter = ~exists().where(ForwardedAlarm.alarm_id==ActiveAlarm.alarm_id)
             query_non_forwarded_alarms = orm_session.query(ActiveAlarm).filter(query_filter)
+            query_rules = orm_session.query(ForwardingRule)
             for alarm_saved in query_non_forwarded_alarms.all():
-                # ToDo: check rule
-                if True:
-                    # create forwarding
-                    forwarded_alarm = ForwardedAlarm(
-                        alarm_id=alarm_saved.alarm_id,
-                        rule_id=1,
-                        forwarded=False
-                    )
-                    orm_session.add(forwarded_alarm)
+                for rule in query_rules.all():
+                    # check rule matching
+                    if rule_evaluator.evaluate_object(rule.rule_match, alarm_saved):
+                        # create forwarding
+                        forwarded_alarm = ForwardedAlarm(
+                            alarm_id=alarm_saved.alarm_id,
+                            rule_id=rule.rule_id,
+                            forwarded=False
+                        )
+                        orm_session.add(forwarded_alarm)
             orm_session.commit()
 
             # walk through all forwardings, that were not executed yet
