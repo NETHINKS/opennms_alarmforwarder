@@ -12,8 +12,11 @@ def main():
     receiver = OpennmsReceiver(config)
     scheduler = Scheduler(config, receiver)
 
-    # start scheduler
-    scheduler.run()
+    # run scheduler
+    try:
+        scheduler.run()
+    except KeyboardInterrupt:
+        print("Shutting down...")
 
 
 if __name__ == "__main__":
