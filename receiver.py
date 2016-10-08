@@ -19,9 +19,9 @@ class OpennmsReceiver(object):
         alarms = {}
 
         # config
-        config_rest_url = "https://demo.opennms.org/opennms/rest"
-        config_rest_user = "demo"
-        config_rest_pw = "demo"
+        config_rest_url = self.__config.get_value("OpenNMS","url", "https://demo.opennms.org/opennms/rest")
+        config_rest_user = self.__config.get_value("OpenNMS", "user", "demo")
+        config_rest_pw = self.__config.get_value("OpenNMS", "password", "demo")
 
         # get alarms from OpenNMS REST API
         requests.packages.urllib3.disable_warnings(InsecureRequestWarning)

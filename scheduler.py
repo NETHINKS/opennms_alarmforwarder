@@ -84,6 +84,8 @@ class Scheduler(object):
                     alarm_forwarding.forwarded=True
             orm_session.commit()
 
+            # close ORM session
+            orm_session.close()
 
             # wait time limit for the next scheduler run
             time.sleep(30)
