@@ -9,8 +9,11 @@ import model
 class OpennmsReceiver(object):
     """Receiver for OpenNMS alarms"""
 
-    def __init__(self, config):
-        self.__config = config
+    def __init__(self, source):
+        self.__source = source
+
+    def test_connection(self):
+        pass
 
     def get_alarms(self):
         """Get all alarms from OpenNMS and return a map with
@@ -19,9 +22,9 @@ class OpennmsReceiver(object):
         alarms = {}
 
         # config
-        config_rest_url = self.__config.get_value("OpenNMS","url", "https://demo.opennms.org/opennms/rest")
-        config_rest_user = self.__config.get_value("OpenNMS", "user", "demo")
-        config_rest_pw = self.__config.get_value("OpenNMS", "password", "demo")
+        config_rest_url = self.__source.source_url
+        config_rest_user = self.__source.source_user
+        config_rest_pw = self.__source.source_password
 
         # get alarms from OpenNMS REST API
         requests.packages.urllib3.disable_warnings(InsecureRequestWarning)

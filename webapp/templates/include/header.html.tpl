@@ -26,6 +26,7 @@
                 <div class="collapse navbar-collapse" id="navbar-collapse-1">
                     <ul class="nav navbar-nav">
                         <li><a href="/">Home</a></li>
+                        <li><a href="/sources">Sources</a></li>
                         <li><a href="/targets">Targets</a></li>
                         <li><a href="/rules">Forwarding Rules</a></li>
                     </ul>

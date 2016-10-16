@@ -9,8 +9,7 @@ from config import Config
 def main():
     # init
     config = Config()
-    receiver = OpennmsReceiver(config)
-    scheduler = Scheduler(config, receiver)
+    scheduler = Scheduler(config)
 
     # run scheduler
     try:

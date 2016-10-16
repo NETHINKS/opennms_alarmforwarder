@@ -7,12 +7,11 @@
 <h1>Forwarding Rules</h1>
 
 <table class="table table-default">
-    <th>
-        <tr>
-            <td>Rule</td>
-            <td>Target</td>
-        </tr>
-    </th>
+    <tr>
+            <th>Rule</th>
+            <th>Target</th>
+            <th>Action</th>
+    </tr>
     {% for rule in rules %}
         <tr>
             <td>{{ rule.rule_match }}</td>

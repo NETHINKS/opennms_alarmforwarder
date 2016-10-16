@@ -1,16 +1,23 @@
 """Forwarding module for opennms_alarmforwarder"""
 
 import sys
+from collections import OrderedDict
 
 class Forwarder(object):
 
-    def __init__(self, name, parameter):
+    default_parameters = OrderedDict()
+
+    def __init__(self, name, parameters):
         self._name = name
-        self._parameter = parameter
+        self._parameters = parameters
         
     def create_forwarder(name, classname, parameter):
         classobj = getattr(sys.modules[__name__], classname)
         return classobj(name, parameter)
+
+    def get_default_parameters(classname):
+        classobj = getattr(sys.modules[__name__], classname)
+        return classobj.default_parameters
 
     def forward_alarm(self, alarm):
         pass
@@ -20,6 +27,11 @@ class Forwarder(object):
 
 
 class StdoutForwarder(Forwarder):
+
+    default_parameters = OrderedDict([
+        ("AlertMessage", "Forward alarm: %alarm_logmessage%"),
+        ("ResolvedMessage", "Resolve alarm: %alarm_logmessage%")
+    ])
 
     def forward_alarm(self, alarm):
         print("Forward alarm: " + str(alarm))

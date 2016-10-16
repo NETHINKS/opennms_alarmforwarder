@@ -5,6 +5,7 @@ from flask import request
 from flask import redirect
 from flask import url_for
 import model
+import forwarder
 
 basedir = os.path.dirname(__file__)
 app = Flask("opennms_alarmforwarder", template_folder=basedir+"/templates",
@@ -13,6 +14,45 @@ app = Flask("opennms_alarmforwarder", template_folder=basedir+"/templates",
 @app.route("/")
 def index():
     return render_template("index.html.tpl")
+
+
+
+@app.route("/sources")
+def get_source_list():
+    orm_session = model.Session()
+    sources = orm_session.query(model.Source).all()
+    orm_session.close()
+    return render_template("source_list.html.tpl", sources=sources)
+
+@app.route("/sources/add", methods=['POST'])
+def add_source():
+    source_name = request.form["name"]
+    source_url = request.form["url"]
+    source_user = request.form["user"]
+    source_password = request.form["password"]
+    source_filter = request.form["filter"]
+    orm_session = model.Session()
+    # add source
+    source = model.Source(source_name=source_name, source_url=source_url, source_user=source_user,
+                          source_password=source_password, source_filter=source_filter)
+    orm_session.add(source)
+    orm_session.commit()
+    orm_session.close()
+    return render_template("index.html.tpl")
+
+@app.route("/sources/<name>/delete")
+def delete_source(name):
+    orm_session = model.Session()
+    source = orm_session.query(model.Source).filter(model.Source.source_name==name).first()
+    if source is None:
+        orm_sesion.close()
+        error_msg = "Source " + name + "not found!"
+        return render_template("error.html.tpl", message=error_msg)
+    else:
+        orm_session.delete(source)
+        orm_session.commit()
+        orm_session.close()
+        return render_template("index.html.tpl")
 
 
 
@@ -29,26 +69,51 @@ def get_target_list():
 def get_target(name):
     orm_session = model.Session()
     target = orm_session.query(model.Target).filter(model.Target.target_name==name).first()
+    parameters = target.target_parms
     orm_session.close()
     if target is None:
         error_msg = "Target " + name + " not found!"
         return render_template("error.html.tpl", message=error_msg)
     else:
-        return render_template("target_view.html.tpl", target=target)
+        return render_template("target_view.html.tpl", target=target, parameters=parameters)
+
+@app.route("/targets/<name>/delete")
+def delete_target(name):
+    orm_session = model.Session()
+    target = orm_session.query(model.Target).filter(model.Target.target_name==name).first()
+    if target is None:
+        orm_sesion.close()
+        error_msg = "Target " + name + "not found!"
+        return render_template("error.html.tpl", message=error_msg)
+    else:
+        orm_session.delete(target)
+        orm_session.commit()
+        orm_session.close()
+        return render_template("index.html.tpl")
 
 @app.route("/targets/add", methods=['POST'])
 def add_target():
     action = request.form["action"]
     target_name = request.form["name"]
     target_class = request.form["class"]
+    default_parameters = forwarder.Forwarder.get_default_parameters(target_class)
     parameters = {}
+    for request_parm in request.form:
+        if request_parm != "action" and request_parm != "class" and request_parm != "name":
+            parameters[request_parm] = request.form[request_parm]
     if action == "show_form":
         return render_template("target_add.html.tpl", target_name=target_name,
-                               target_class=target_class, target_parameters=parameters)
+                               target_class=target_class, target_parameters=default_parameters)
     if action == "add":
         orm_session = model.Session()
+        # add target
         target = model.Target(target_name=target_name, target_class=target_class)
         orm_session.add(target)
+        # add target parameters
+        for parameter in parameters:
+            parameter_obj = model.TargetParameter(target_name=target_name, parameter_name=parameter,
+                                                  parameter_value=parameters[parameter])
+            orm_session.add(parameter_obj)
         orm_session.commit()
         orm_session.close()
         return render_template("index.html.tpl")

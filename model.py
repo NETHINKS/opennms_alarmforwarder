@@ -92,3 +92,12 @@ class TargetParameter(Base):
     target = relationship("Target")
 
 
+class Source(Base):
+
+    __tablename__ = "source"
+
+    source_name = Column(String, primary_key=True)
+    source_url = Column(String)
+    source_user = Column(String)
+    source_password = Column(String)
+    source_filter = Column(String)

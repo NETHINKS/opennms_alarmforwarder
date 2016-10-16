@@ -46,11 +46,19 @@
 
 <!-- table with all targets -->
 <table class="table table-default">
+    <tr>
+            <th>Name</th>
+            <th>Class</th>
+            <th>Action</th>
+    </tr>
     {% for target in targets %}
         <tr>
             <td>{{ target.target_name }}</td>
             <td>{{ target.target_class }}</td>
-            <td><a href="/targets/{{ target.target_name }}"><span class="glyphicon glyphicon-eye-open"></span></a></td>
+            <td>
+                <a href="/targets/{{ target.target_name }}"><span class="glyphicon glyphicon-eye-open"></span></a>
+                <a href="/targets/{{ target.target_name }}/delete"><span class="glyphicon glyphicon-remove"></span></a>
+            </td>
         </tr>
     {% endfor %}
 

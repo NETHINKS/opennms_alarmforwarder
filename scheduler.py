@@ -12,24 +12,31 @@ from model import ForwardedAlarm
 from model import ForwardingRule
 from rulematching import RuleEvaluator
 from forwarder import Forwarder
+from receiver import OpennmsReceiver
 
 class Scheduler(object):
 
-    def __init__(self, config, receiver):
+    def __init__(self, config):
         self.__config = config
-        self.__receiver = receiver
 
     def run(self):
-        # create onjects
+        # create objects
         rule_evaluator = RuleEvaluator()
 
         # scheduling loop
         while True:
+            # open ORM session
+            orm_session = model.Session()
+
+            # get first configured source from database
+            # ToDo: support multiple sources
+            source = orm_session.query(model.Source).first()
+            receiver = OpennmsReceiver(source)
+
             #get alarms from OpenNMS
-            alarms_onms = self.__receiver.get_alarms()
+            alarms_onms = receiver.get_alarms()
 
             # save alarms in active_alarm database table
-            orm_session = model.Session()
             query_saved_alarms = orm_session.query(model.ActiveAlarm)
             # add/update alarms to/in database table
             for alarm_id in alarms_onms:
