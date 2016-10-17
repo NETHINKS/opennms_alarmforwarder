@@ -35,8 +35,14 @@ class Scheduler(object):
             for source in sources:
                 receiver = OpennmsReceiver(source)
 
-                #get alarms from OpenNMS
-                alarms_onms = receiver.get_alarms()
+                # try to get alarms from OpenNMS
+                try:
+                    alarms_onms = receiver.get_alarms()
+                except:
+                    source.source_status = model.Source.source_status_down
+                    orm_session.commit()
+                    continue
+                source.source_status = model.Source.source_status_up
 
                 # add/update alarms to/in database table
                 for alarm_id in alarms_onms:

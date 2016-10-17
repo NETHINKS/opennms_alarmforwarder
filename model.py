@@ -106,5 +106,10 @@ class Source(Base):
     source_user = Column(String)
     source_password = Column(String)
     source_filter = Column(String)
+    source_status = Column(Integer)
 
     alarm_entries = relationship("ActiveAlarm", cascade="all, delete-orphan")
+
+    source_status_unknown = 0
+    source_status_up = 1
+    source_status_down = 2

@@ -84,7 +84,8 @@ def add_source():
     orm_session = model.Session()
     # add source
     source = model.Source(source_name=source_name, source_url=source_url, source_user=source_user,
-                          source_password=source_password, source_filter=source_filter)
+                          source_password=source_password, source_filter=source_filter,
+                          source_status=model.Source.source_status_unknown)
     orm_session.add(source)
     orm_session.commit()
     orm_session.close()
