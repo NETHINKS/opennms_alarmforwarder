@@ -56,7 +56,7 @@
             <td>{{ target.target_name }}</td>
             <td>{{ target.target_class }}</td>
             <td>
-                <a href="/targets/{{ target.target_name }}"><span class="glyphicon glyphicon-eye-open"></span></a>
+                <a href="/targets/{{ target.target_name }}"><span class="glyphicon glyphicon-edit"></span></a>
                 <a href="/targets/{{ target.target_name }}/delete"><span class="glyphicon glyphicon-remove"></span></a>
             </td>
         </tr>

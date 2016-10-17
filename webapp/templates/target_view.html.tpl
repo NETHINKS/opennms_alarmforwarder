@@ -2,17 +2,19 @@
 
 <h1>Target {{ target.target_name }}</h1>
 
-<table>
-    <tr>
-        <td>class</td>
-        <td>{{ target.target_class }}</td>
-    </tr>
+<form method="POST" action="/targets/{{ target.target_name }}/edit">
+    <div class="form-group">
+        <label for="inputClass">Class</label>
+        <input type="text" class="form-control" id="inputClass" name="class" value="{{ target.target_class }}" disabled="disabled" />
+    </div>
     {% for parameter in parameters %}
-    <tr>
-        <td>{{ parameter.parameter_name }}</td>
-        <td>{{ parameter.parameter_value }}</td>
-    </tr>
+        <div class="form-group">
+            <label for="input{{parameter.parameter_name}}">{{parameter.parameter_name}}</label>
+            <input type="text" class="form-control" id="input{{parameter.parameter_name}}" 
+                   name="{{parameter.parameter_name}}" value="{{ parameter.parameter_value }}" />
+        </div>
     {% endfor %}
-</table>
+    <button type="submit" class="btn btn-default">Change</button>
+</form>
 
 {% include 'include/footer.html.tpl' %}

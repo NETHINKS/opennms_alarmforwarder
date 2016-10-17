@@ -26,6 +26,35 @@ def get_source_list():
     orm_session.close()
     return render_template("source_list.html.tpl", sources=sources)
 
+@app.route("/sources/<name>")
+def get_source(name):
+    orm_session = model.Session()
+    source = orm_session.query(model.Source).filter(model.Source.source_name==name).first()
+    orm_session.close()
+    if source is None:
+        flash("Source " + name + " not found!", "alert-danger")
+        return redirect("/sources")
+    return render_template("source_view.html.tpl", source=source)
+
+@app.route("/sources/<name>/edit", methods=['POST'])
+def edit_source(name):
+    orm_session = model.Session()
+    source = orm_session.query(model.Source).filter(model.Source.source_name==name).first()
+    if source is None:
+        orm_session.close()
+        flash("Source " + name + " not found!", "alert-danger")
+        return redirect("/sources")
+    else:
+        # update source
+        source.source_url = request.form["url"]
+        source.source_user = request.form["user"]
+        source.source_password = request.form["password"]
+        source.source_filter = request.form["filter"]
+        orm_session.commit()
+        orm_session.close()
+        flash("Source " + name + " successfully changed", "alert-success")
+        return redirect("/sources")
+
 @app.route("/sources/add", methods=['POST'])
 def add_source():
     source_name = request.form["name"]
@@ -125,6 +154,27 @@ def add_target():
         flash("Target " + target_name + " successfully added", "alert-success")
         return redirect("/targets")
 
+@app.route("/targets/<name>/edit", methods=['POST'])
+def edit_target(name):
+    orm_session = model.Session()
+    target = orm_session.query(model.Target).filter(model.Target.target_name==name).first()
+    if target is None:
+        orm_session.close()
+        flash("Target " + name + " not found!", "alert-danger")
+        return redirect("/targets")
+    else:
+        #update target parameters
+        for request_parm in request.form:
+            if request_parm != "action" and request_parm != "class" and request_parm != "name":
+                for target_parm in target.target_parms:
+                    if target_parm.parameter_name == request_parm:
+                        target_parm.parameter_value = request.form[request_parm]
+        orm_session.commit()
+        orm_session.close()
+        flash("Target " + name + " successfully changed", "alert-success")
+        return redirect("/targets")
+
+
 
 
 @app.route("/rules")
@@ -133,6 +183,18 @@ def get_rule_list():
     rules = orm_session.query(model.ForwardingRule).all()
     orm_session.close()
     return render_template("rule_list.html.tpl", rules=rules)
+
+@app.route("/rules/<rule_id>")
+def get_rule(rule_id):
+    orm_session = model.Session()
+    targets = orm_session.query(model.Target).all()
+    rule = orm_session.query(model.ForwardingRule).filter(model.ForwardingRule.rule_id==rule_id).\
+                      first()
+    if rule is None:
+        orm_session.close()
+        flash("Rule " + rule_id + " not found!", "alert-danger")
+        return redirect("/rules")
+    return render_template("rule_view.html.tpl", rule=rule, targets=targets)
 
 @app.route("/rules/add", methods=['GET', 'POST'])
 def add_rule():
@@ -150,6 +212,23 @@ def add_rule():
         orm_session.commit()
         orm_session.close()
         flash("Rule successfully added", "alert-success")
+        return redirect("/rules")
+
+@app.route("/rules/<rule_id>/edit", methods=['POST'])
+def edit_rule(rule_id):
+    orm_session = model.Session()
+    rule = orm_session.query(model.ForwardingRule).filter(model.ForwardingRule.rule_id==rule_id).\
+                      first()
+    if rule is None:
+        orm_session.close()
+        flash("Rule " + rule_id + " not found!", "alert-danger")
+        return redirect("/rules")
+    else:
+        rule.rule_target = request.form["target"]
+        rule.rule_match = request.form["match"]
+        orm_session.commit()
+        orm_session.close()
+        flash("Rule successfully changed", "alert-success")
         return redirect("/rules")
 
 @app.route("/rules/<rule_id>/delete")

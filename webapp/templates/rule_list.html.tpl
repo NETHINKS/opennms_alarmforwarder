@@ -16,7 +16,10 @@
         <tr>
             <td>{{ rule.rule_match }}</td>
             <td>{{ rule.rule_target }}</td>
-            <td><a href="/rules/{{ rule.rule_id }}/delete"><span class="glyphicon glyphicon-remove"></span></a></td>
+            <td>
+                <a href="/rules/{{ rule.rule_id }}"><span class="glyphicon glyphicon-edit"></span></a>
+                <a href="/rules/{{ rule.rule_id }}/delete"><span class="glyphicon glyphicon-remove"></span></a>
+            </td>
         </tr>
     {% endfor %}
 
