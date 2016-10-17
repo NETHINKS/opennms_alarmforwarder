@@ -1,5 +1,6 @@
 import os
 from flask import Flask
+from flask import flash
 from flask import render_template
 from flask import request
 from flask import redirect
@@ -10,6 +11,7 @@ import forwarder
 basedir = os.path.dirname(__file__)
 app = Flask("opennms_alarmforwarder", template_folder=basedir+"/templates",
             static_folder=basedir+"/static")
+app.secret_key = 'msdniuf7go832gfvzuztcur65'
 
 @app.route("/")
 def index():
@@ -38,21 +40,23 @@ def add_source():
     orm_session.add(source)
     orm_session.commit()
     orm_session.close()
-    return render_template("index.html.tpl")
+    flash("Source " + source_name + " successfully added", "alert-success")
+    return redirect("/sources")
 
 @app.route("/sources/<name>/delete")
 def delete_source(name):
     orm_session = model.Session()
     source = orm_session.query(model.Source).filter(model.Source.source_name==name).first()
     if source is None:
-        orm_sesion.close()
-        error_msg = "Source " + name + "not found!"
-        return render_template("error.html.tpl", message=error_msg)
+        orm_session.close()
+        flash("Source " + name + " not found!", "alert-danger")
+        return redirect("/sources")
     else:
         orm_session.delete(source)
         orm_session.commit()
         orm_session.close()
-        return render_template("index.html.tpl")
+        flash("Source " + name + " successfully deleted", "alert-success")
+        return redirect("/sources")
 
 
 
@@ -69,12 +73,13 @@ def get_target_list():
 def get_target(name):
     orm_session = model.Session()
     target = orm_session.query(model.Target).filter(model.Target.target_name==name).first()
-    parameters = target.target_parms
-    orm_session.close()
     if target is None:
-        error_msg = "Target " + name + " not found!"
-        return render_template("error.html.tpl", message=error_msg)
+        orm_session.close()
+        flash("Target " + name + " not found!", "alert-danger")
+        return redirect("/targets")
     else:
+        parameters = target.target_parms
+        orm_session.close()
         return render_template("target_view.html.tpl", target=target, parameters=parameters)
 
 @app.route("/targets/<name>/delete")
@@ -82,14 +87,15 @@ def delete_target(name):
     orm_session = model.Session()
     target = orm_session.query(model.Target).filter(model.Target.target_name==name).first()
     if target is None:
-        orm_sesion.close()
-        error_msg = "Target " + name + "not found!"
-        return render_template("error.html.tpl", message=error_msg)
+        orm_session.close()
+        flash("Target " + name + " not found!", "alert-danger")
+        return redirect("/targets")
     else:
         orm_session.delete(target)
         orm_session.commit()
         orm_session.close()
-        return render_template("index.html.tpl")
+        flash("Target " + name + " successfully deleted", "alert-success")
+        return redirect("/targets")
 
 @app.route("/targets/add", methods=['POST'])
 def add_target():
@@ -116,7 +122,8 @@ def add_target():
             orm_session.add(parameter_obj)
         orm_session.commit()
         orm_session.close()
-        return render_template("index.html.tpl")
+        flash("Target " + target_name + " successfully added", "alert-success")
+        return redirect("/targets")
 
 
 
@@ -142,7 +149,8 @@ def add_rule():
         orm_session.add(rule)
         orm_session.commit()
         orm_session.close()
-        return render_template("index.html.tpl")
+        flash("Rule successfully added", "alert-success")
+        return redirect("/rules")
 
 @app.route("/rules/<rule_id>/delete")
 def delete_rule(rule_id):
@@ -150,11 +158,12 @@ def delete_rule(rule_id):
     rule = orm_session.query(model.ForwardingRule).filter(model.ForwardingRule.rule_id==rule_id).\
                       first()
     if rule is None:
-        orm_sesion.close()
-        error_msg = "Rule " + rule_id + "not found!"
-        return render_template("error.html.tpl", message=error_msg)
+        orm_session.close()
+        flash("Rule " + rule_id + " not found!", "alert-danger")
+        return redirect("/rules")
     else:
         orm_session.delete(rule)
         orm_session.commit()
         orm_session.close()
-        return render_template("index.html.tpl")
+        flash("Rule successfully deleted", "alert-success")
+        return redirect("/rules")
