@@ -2,7 +2,7 @@
 """
 
 from sqlalchemy import create_engine
-from sqlalchemy import ForeignKey, Column, Integer, String, DateTime
+from sqlalchemy import ForeignKey, ForeignKeyConstraint, Column, Integer, String, DateTime
 from sqlalchemy.types import Boolean
 from sqlalchemy.orm import relationship, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
@@ -17,6 +17,7 @@ class ActiveAlarm(Base):
     __tablename__ = "active_alarm"
 
     alarm_id = Column(Integer, primary_key=True)
+    alarm_source = Column(String, ForeignKey("source.source_name"), primary_key=True)
     alarm_uei = Column(String)
     alarm_timestamp = Column(DateTime)
     alarm_severity = Column(String)
@@ -28,6 +29,7 @@ class ActiveAlarm(Base):
     alarm_operinstruct = Column(String)
 
     forwarding_entries = relationship("ForwardedAlarm", cascade="all, delete-orphan")
+    source = relationship("Source")
 
     def __str__(self):
         output = "ID: " + str(self.alarm_id)
@@ -53,9 +55,12 @@ class ForwardedAlarm(Base):
 
     __tablename__ = "forwarded_alarm"
 
-    alarm_id = Column(Integer, ForeignKey("active_alarm.alarm_id"), primary_key=True)
+    alarm_id = Column(Integer, primary_key=True)
+    alarm_source = Column(String, primary_key=True)
     rule_id = Column(Integer, ForeignKey("forwarding_rule.rule_id"), primary_key=True)
     forwarded = Column(Boolean)
+
+    __table_args__ = (ForeignKeyConstraint(["alarm_id", "alarm_source"], ["active_alarm.alarm_id", "active_alarm.alarm_source"]), {})
 
     alarm = relationship("ActiveAlarm")
     rule = relationship("ForwardingRule")
@@ -101,3 +106,5 @@ class Source(Base):
     source_user = Column(String)
     source_password = Column(String)
     source_filter = Column(String)
+
+    alarm_entries = relationship("ActiveAlarm", cascade="all, delete-orphan")

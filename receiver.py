@@ -32,6 +32,7 @@ class OpennmsReceiver(object):
         try:
             response = requests.get(request_url, auth=(config_rest_user, config_rest_pw),
                                     verify=False)
+        # ToDo: error handling
         except:
             raise
         if response.status_code != 200:
@@ -74,6 +75,7 @@ class OpennmsReceiver(object):
             # create alarm
             created_alarm = model.ActiveAlarm(
                 alarm_id=alarm_id,
+                alarm_source=self.__source.source_name,
                 alarm_uei=alarm_uei,
                 alarm_timestamp=alarm_timestamp,
                 alarm_severity=alarm_severity,
