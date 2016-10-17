@@ -13,7 +13,26 @@ class OpennmsReceiver(object):
         self.__source = source
 
     def test_connection(self):
-        pass
+        """tests connection to OpenNMS REST API and returns HTTP status code
+        returns -1, if there was an error connecting to the server
+        """
+        # return code
+        output = -1
+
+        # config
+        config_rest_url = self.__source.source_url
+        config_rest_user = self.__source.source_user
+        config_rest_pw = self.__source.source_password
+
+        # test connection to OpenNMS REST API
+        requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+        request_url = config_rest_url + "/info"
+        try:
+            response = requests.get(request_url, auth=(config_rest_user, config_rest_pw),
+                                    verify=False)
+        except:
+            return output
+        return response.status_code
 
     def get_alarms(self):
         """Get all alarms from OpenNMS and return a map with
@@ -32,7 +51,7 @@ class OpennmsReceiver(object):
         try:
             response = requests.get(request_url, auth=(config_rest_user, config_rest_pw),
                                     verify=False)
-        # ToDo: error handling
+        # error handling
         except:
             raise
         if response.status_code != 200:

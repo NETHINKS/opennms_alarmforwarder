@@ -7,6 +7,7 @@ from flask import redirect
 from flask import url_for
 import model
 import forwarder
+import receiver
 
 basedir = os.path.dirname(__file__)
 app = Flask("opennms_alarmforwarder", template_folder=basedir+"/templates",
@@ -35,6 +36,24 @@ def get_source(name):
         flash("Source " + name + " not found!", "alert-danger")
         return redirect("/sources")
     return render_template("source_view.html.tpl", source=source)
+
+@app.route("/sources/<name>/test")
+def test_source(name):
+    orm_session = model.Session()
+    source = orm_session.query(model.Source).filter(model.Source.source_name==name).first()
+    orm_session.close()
+    if source is None:
+        flash("Source " + name + " not found!", "alert-danger")
+        return redirect("/sources")
+    recv = receiver.OpennmsReceiver(source)
+    test_result = recv.test_connection()
+    if test_result == 200:
+        flash("Test of source " + name + " successful: HTTP/" + str(test_result), "alert-success")
+    elif test_result == -1:
+        flash("Test of source " + name + " failed: Error connecting to server", "alert-danger")
+    else:
+        flash("Test of source " + name + " failed: HTTP/" + str(test_result), "alert-danger")
+    return redirect("/sources")
 
 @app.route("/sources/<name>/edit", methods=['POST'])
 def edit_source(name):
