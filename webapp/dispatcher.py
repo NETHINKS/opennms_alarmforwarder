@@ -131,6 +131,22 @@ def get_target(name):
         orm_session.close()
         return render_template("target_view.html.tpl", target=target, parameters=parameters)
 
+@app.route("/targets/<name>/test")
+def test_target(name):
+    orm_session = model.Session()
+    target = orm_session.query(model.Target).filter(model.Target.target_name==name).first()
+    if target is None:
+        orm_session.close()
+        flash("Target " + name + " not found!", "alert-danger")
+        return redirect("/targets")
+    else:
+        parameters = target.target_parms
+        orm_session.close()
+        forwarder_obj = forwarder.Forwarder.create_forwarder(target.target_name, target.target_class, parameters)
+        forwarder_obj.test_forwarder()
+        flash("Target " + name + " tested", "alert-info")
+        return redirect("/targets")
+
 @app.route("/targets/<name>/delete")
 def delete_target(name):
     orm_session = model.Session()

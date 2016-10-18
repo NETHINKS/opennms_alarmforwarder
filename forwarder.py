@@ -19,6 +19,9 @@ class Forwarder(object):
         classobj = getattr(sys.modules[__name__], classname)
         return classobj.default_parameters
 
+    def test_forwarder(self):
+        pass
+
     def forward_alarm(self, alarm):
         pass
 
@@ -32,6 +35,9 @@ class StdoutForwarder(Forwarder):
         ("AlertMessage", "Forward alarm: %alarm_logmessage%"),
         ("ResolvedMessage", "Resolve alarm: %alarm_logmessage%")
     ])
+
+    def test_forwarder(self):
+        print("This is a test of the forwarder " + self._name)
 
     def forward_alarm(self, alarm):
         print("Forward alarm: " + str(alarm))
