@@ -1,8 +1,11 @@
 """Forwarding module for opennms_alarmforwarder"""
 
+import email
+from email.mime.text import MIMEText
 import inspect
 import logging
 import re
+import smtplib
 import sys
 import requests
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
@@ -130,3 +133,62 @@ class SmsEagleForwarder(Forwarder):
         else:
             self._logger.info("Send SMS to %s: %s", target, message)
 
+
+class EmailForwarder(Forwarder):
+
+    default_parameters = OrderedDict([
+        ("smtpServer", "127.0.0.1"),
+        ("smtpAuth", "true"),
+        ("smtpUser", "admin"),
+        ("smtpPassword", "admin"),
+        ("fromAddress", "root@example.com"),
+        ("target", "mail@example.com"),
+        ("subjectFormatAlarm", "Alarm: %alarm_uei%"),
+        ("subjectFormatResolved", "Resolved: %alarm_uei%"),
+        ("messageFormatAlarm", "Alarm:\r\n %alarm_logmsg%"),
+        ("messageFormatResolved", "Resolved:\r\n %alarm_logmsg%")
+    ])
+
+    def test_forwarder(self):
+        subject = "Test of forwarder " + self._name
+        message = "This is a test of forwarder " + self._name
+        self.send_message(subject, message)
+
+    def forward_alarm(self, alarm):
+        subject = self.substitute_alarm_variables(self.get_parameter("subjectFormatAlarm"), alarm)
+        message = self.substitute_alarm_variables(self.get_parameter("messageFormatAlarm"), alarm)
+        self.send_message(subject, message)
+
+    def resolve_alarm(self, alarm):
+        subject = self.substitute_alarm_variables(self.get_parameter("subjectFormatResolved"), alarm)
+        message = self.substitute_alarm_variables(self.get_parameter("messageFormatResolved"), alarm)
+        self.send_message(subject, message)
+
+    def send_message(self, subject, message):
+        # set parameters
+        from_address = self.get_parameter("fromAddress")
+        to_address = self.get_parameter("target")
+        smtp_host = self.get_parameter("smtpServer")
+        smtp_user = self.get_parameter("smtpUser")
+        smtp_password = self.get_parameter("smtpPassword")
+        smtp_auth = False
+        if self.get_parameter("smtpAuth") == "true":
+            smtp_auth = True
+
+        # create message
+        message_object = MIMEText(message)
+        message_object["Subject"] = subject
+        message_object["From"] = from_address
+        message_object["To"] = to_address
+
+        # send mail
+        try:
+            with smtplib.SMTP() as smtp_connection:
+                smtp_connection.connect(smtp_host)
+                if smtp_auth:
+                    smtp_connection.login(smtp_user, smtp_password)
+                smtp_connection.send_message(message_object)
+                smtp_connection.quit()
+            self._logger.info("Send mail to %s: subject: %s", to_address, subject)
+        except:
+            self._logger.error("Could not send mail to %s: subject: %s", to_address, message)
