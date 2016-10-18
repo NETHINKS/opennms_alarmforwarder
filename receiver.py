@@ -1,6 +1,7 @@
 """receiver modul"""
 
 import datetime
+import logging
 import xml.etree.ElementTree
 import requests
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
@@ -11,6 +12,7 @@ class OpennmsReceiver(object):
 
     def __init__(self, source):
         self.__source = source
+        self.__logger = logging.getLogger("receiver")
 
     def test_connection(self):
         """tests connection to OpenNMS REST API and returns HTTP status code
@@ -53,9 +55,13 @@ class OpennmsReceiver(object):
                                     verify=False)
         # error handling
         except:
+            self.__logger.error("could not connect to source " + self.__source.source_name)
             raise
         if response.status_code != 200:
-            raise Exception("Error connecting to OpenNMS: HTTP/" + str(response.status_code))
+            error_msg = "could not connect to source " + self.__source.source_name
+            error_msg+= ": HTTP/" + str(response.status_code)
+            self.__logger.error(error_msg)
+            raise Exception(error_msg)
 
         # parse xml and create alarm
         xml_tree = xml.etree.ElementTree.fromstring(response.text)
