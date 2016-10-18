@@ -113,7 +113,7 @@ def delete_source(name):
 def get_target_list():
     orm_session = model.Session()
     targets = orm_session.query(model.Target).all()
-    forwarder_classes = ['StdoutForwarder']
+    forwarder_classes = forwarder.Forwarder.get_forwarder_classnames()
     orm_session.close()
     return render_template("target_list.html.tpl", targets=targets,
                            forwarder_classes=forwarder_classes)

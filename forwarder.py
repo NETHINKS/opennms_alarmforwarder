@@ -1,8 +1,11 @@
 """Forwarding module for opennms_alarmforwarder"""
 
+import inspect
 import logging
 import re
 import sys
+import requests
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from collections import OrderedDict
 
 class Forwarder(object):
@@ -13,7 +16,13 @@ class Forwarder(object):
         self._name = name
         self._parameters = parameters
         self._logger = logging.getLogger("forwarder")
-        
+
+    def get_forwarder_classnames():
+        classnames = []
+        for class_element in Forwarder.__subclasses__():
+            classnames.append(class_element.__name__)
+        return classnames
+
     def create_forwarder(name, classname, parameter):
         classobj = getattr(sys.modules[__name__], classname)
         return classobj(name, parameter)
@@ -72,3 +81,52 @@ class StdoutForwarder(Forwarder):
     def resolve_alarm(self, alarm):
         alarm_string = self.substitute_alarm_variables(self.get_parameter("ResolvedMessage"), alarm)
         print(alarm_string)
+
+
+class SmsEagleForwarder(Forwarder):
+
+    default_parameters = OrderedDict([
+        ("url", "http://127.0.0.1/index.php/http_api/send_sms"),
+        ("user", "admin"),
+        ("password", "admin"),
+        ("target", "+49123456789"),
+        ("messageFormatAlarm", "Alarm: %alarm_logmsg%"),
+        ("messageFormatResolved", "Resolved: %alarm_logmsg%")
+    ])
+
+    def test_forwarder(self):
+        message = "This is a test of the forwarder " + self._name
+        self.send_message(message)
+
+    def forward_alarm(self, alarm):
+        message = self.substitute_alarm_variables(self.get_parameter("messageFormatAlarm"), alarm)
+        self.send_message(message)
+
+    def resolve_alarm(self, alarm):
+        message = self.substitute_alarm_variables(self.get_parameter("messageFormatResolved"), alarm)
+        self.send_message(message)
+
+    def send_message(self, message):
+        # set parameters
+        target = self.get_parameter("target")
+        url = self.get_parameter("url")
+        url_parameters = {
+            "login": self.get_parameter("user"),
+            "pass": self.get_parameter("password"),
+            "to": target,
+            "message": message
+        }
+
+        # send HTTP GET request to SMS Eagle
+        try:
+            requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+            response = requests.get(url, params=url_parameters)
+        except:
+            self._logger.error("Could not connect to SMS Eagle")
+
+        # check response
+        if response.status_code != 200:
+            self._logger.error("Could not send SMS to %s: %s", target, message)
+        else:
+            self._logger.info("Send SMS to %s: %s", target, message)
+
