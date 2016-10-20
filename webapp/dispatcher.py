@@ -6,6 +6,7 @@ from flask import render_template
 from flask import request
 from flask import redirect
 from flask import url_for
+from sqlalchemy.orm import joinedload
 import model
 import forwarder
 import receiver
@@ -166,39 +167,48 @@ def delete_source(name):
 @app.route("/targets")
 def get_target_list():
     orm_session = model.Session()
-    targets = orm_session.query(model.Target).all()
+    targets = orm_session.query(model.Target).options(joinedload("target_parms")).all()
     forwarder_classes = forwarder.Forwarder.get_forwarder_classnames()
     orm_session.close()
+    if json_check():
+        return jsonify([target.json_repr() for target in targets])
     return render_template("target_list.html.tpl", targets=targets,
                            forwarder_classes=forwarder_classes)
 
 @app.route("/targets/<name>")
 def get_target(name):
     orm_session = model.Session()
-    target = orm_session.query(model.Target).filter(model.Target.target_name==name).first()
+    target = orm_session.query(model.Target).options(joinedload("target_parms")).filter(model.Target.target_name==name).first()
+    orm_session.close()
     if target is None:
-        orm_session.close()
-        flash("Target " + name + " not found!", "alert-danger")
+        error_msg = "Target " + name + " not found!"
+        if json_check():
+            return json_error(error_msg, 404)
+        flash(error_msg, "alert-danger")
         return redirect("/targets")
     else:
-        parameters = target.target_parms
-        orm_session.close()
-        return render_template("target_view.html.tpl", target=target, parameters=parameters)
+        if json_check():
+            return jsonify(target.json_repr())
+        return render_template("target_view.html.tpl", target=target)
 
 @app.route("/targets/<name>/test")
 def test_target(name):
     orm_session = model.Session()
-    target = orm_session.query(model.Target).filter(model.Target.target_name==name).first()
+    target = orm_session.query(model.Target).options(joinedload("target_parms")).filter(model.Target.target_name==name).first()
+    orm_session.close()
     if target is None:
-        orm_session.close()
-        flash("Target " + name + " not found!", "alert-danger")
+        error_msg = "Target " + name + " not found!"
+        if json_check():
+            return json_error(error_msg, 404)
+        flash(error_msg, "alert-danger")
         return redirect("/targets")
     else:
-        parameters = target.target_parms
-        orm_session.close()
-        forwarder_obj = forwarder.Forwarder.create_forwarder(target.target_name, target.target_class, parameters)
+        forwarder_obj = forwarder.Forwarder.create_forwarder(target.target_name, target.target_class, target.target_parms)
         forwarder_obj.test_forwarder()
-        flash("Target " + name + " tested", "alert-info")
+        result_msg = "Target " + name + " tested"
+        if json_check():
+            return json_result(result_msg, 200)
+        flash(result_msg, "alert-info")
         return redirect("/targets")
 
 @app.route("/targets/<name>/delete")
@@ -207,25 +217,39 @@ def delete_target(name):
     target = orm_session.query(model.Target).filter(model.Target.target_name==name).first()
     if target is None:
         orm_session.close()
-        flash("Target " + name + " not found!", "alert-danger")
+        error_msg = "Target " + name + " not found!"
+        if json_check():
+            return json_error(error_msg, 404)
+        flash(error_msg, "alert-danger")
         return redirect("/targets")
     else:
         orm_session.delete(target)
         orm_session.commit()
         orm_session.close()
-        flash("Target " + name + " successfully deleted", "alert-success")
+        result_msg = "Target " + name + " successfully deleted"
+        if json_check():
+            return json_result(result_msg, 200)
+        flash(result_msg, "alert-success")
         return redirect("/targets")
 
 @app.route("/targets/add", methods=['POST'])
 def add_target():
-    action = request.form["action"]
-    target_name = request.form["name"]
-    target_class = request.form["class"]
-    default_parameters = forwarder.Forwarder.get_default_parameters(target_class)
     parameters = {}
-    for request_parm in request.form:
-        if request_parm != "action" and request_parm != "class" and request_parm != "name":
-            parameters[request_parm] = request.form[request_parm]
+    # check, if data are form data or json
+    if request.get_json(silent=True) is not None:
+        action = "add"
+        target_name = request.json["target_name"]
+        target_class = request.json["target_class"]
+        for request_parm in request.json["target_parms"]:
+            parameters[request_parm] = request.json["target_parms"][request_parm]
+    else:
+        action = request.form["action"]
+        target_name = request.form["name"]
+        target_class = request.form["class"]
+        default_parameters = forwarder.Forwarder.get_default_parameters(target_class)
+        for request_parm in request.form:
+            if request_parm != "action" and request_parm != "class" and request_parm != "name":
+                parameters[request_parm] = request.form[request_parm]
     if action == "show_form":
         return render_template("target_add.html.tpl", target_name=target_name,
                                target_class=target_class, target_parameters=default_parameters)
@@ -241,7 +265,10 @@ def add_target():
             orm_session.add(parameter_obj)
         orm_session.commit()
         orm_session.close()
-        flash("Target " + target_name + " successfully added", "alert-success")
+        result_msg = "Target " + target_name + " successfully added"
+        if json_check():
+            return json_result(result_msg, 200)
+        flash(result_msg, "alert-success")
         return redirect("/targets")
 
 @app.route("/targets/<name>/edit", methods=['POST'])
@@ -250,18 +277,33 @@ def edit_target(name):
     target = orm_session.query(model.Target).filter(model.Target.target_name==name).first()
     if target is None:
         orm_session.close()
-        flash("Target " + name + " not found!", "alert-danger")
+        error_msg = "Target " + name + " not found!"
+        if json_check():
+            return json_error(error_msg, 404)
+        flash(error_msg, "alert-danger")
         return redirect("/targets")
     else:
         #update target parameters
-        for request_parm in request.form:
-            if request_parm != "action" and request_parm != "class" and request_parm != "name":
+        # check, if data are form data or json
+        if request.get_json(silent=True) is not None:
+            # update source from json data
+            for request_parm in request.json["target_parms"]:
                 for target_parm in target.target_parms:
                     if target_parm.parameter_name == request_parm:
-                        target_parm.parameter_value = request.form[request_parm]
+                        target_parm.parameter_value = request.json["target_parms"][request_parm]
+        else:
+            # update source from form data
+            for request_parm in request.form:
+                if request_parm != "action" and request_parm != "class" and request_parm != "name":
+                    for target_parm in target.target_parms:
+                        if target_parm.parameter_name == request_parm:
+                            target_parm.parameter_value = request.form[request_parm]
         orm_session.commit()
         orm_session.close()
-        flash("Target " + name + " successfully changed", "alert-success")
+        result_msg = "Target " + name + " successfully changed"
+        if json_check():
+            return json_result(result_msg, 200)
+        flash(result_msg, "alert-success")
         return redirect("/targets")
 
 

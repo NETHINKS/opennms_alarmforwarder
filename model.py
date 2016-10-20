@@ -87,6 +87,13 @@ class Target(Base):
 
     forwarding_rules = relationship("ForwardingRule", cascade="all, delete-orphan")
 
+    def json_repr(self):
+        data = OrderedDict([
+            ("target_name", self.target_name),
+            ("target_class", self.target_class),
+            ("target_parms", {parm.parameter_name: parm.parameter_value for parm in self.target_parms})
+        ])
+        return json.dumps(data)
 
 class TargetParameter(Base):
 

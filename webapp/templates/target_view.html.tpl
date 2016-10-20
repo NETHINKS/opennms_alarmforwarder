@@ -7,7 +7,7 @@
         <label for="inputClass">Class</label>
         <input type="text" class="form-control" id="inputClass" name="class" value="{{ target.target_class }}" disabled="disabled" />
     </div>
-    {% for parameter in parameters %}
+    {% for parameter in target.target_parms %}
         <div class="form-group">
             <label for="input{{parameter.parameter_name}}">{{parameter.parameter_name}}</label>
             <input type="text" class="form-control" id="input{{parameter.parameter_name}}" 
