@@ -314,6 +314,8 @@ def get_rule_list():
     orm_session = model.Session()
     rules = orm_session.query(model.ForwardingRule).all()
     orm_session.close()
+    if json_check():
+        return jsonify([rule.json_repr() for rule in rules])
     return render_template("rule_list.html.tpl", rules=rules)
 
 @app.route("/rules/<rule_id>")
@@ -324,8 +326,13 @@ def get_rule(rule_id):
                       first()
     if rule is None:
         orm_session.close()
-        flash("Rule " + rule_id + " not found!", "alert-danger")
+        error_msg = "Rule " + rule_id + " not found!"
+        if json_check():
+            return json_error(error_msg, 404)
+        flash(error_msg, "alert-danger")
         return redirect("/rules")
+    if json_check():
+        return jsonify(rule.json_repr())
     return render_template("rule_view.html.tpl", rule=rule, targets=targets)
 
 @app.route("/rules/add", methods=['GET', 'POST'])
@@ -336,13 +343,21 @@ def add_rule():
         orm_session.close()
         return render_template("rule_add.html.tpl", targets=targets)
     else:
+        # check, if data are form data or json
+        if request.get_json(silent=True) is not None:
+            rule_match = request.json["rule_match"]
+            rule_target = request.json["rule_target"]
+        else:
+            rule_match = request.form['rule']
+            rule_target = request.form['target']
         orm_session = model.Session()
-        rule_match = request.form['rule']
-        rule_target = request.form['target']
         rule = model.ForwardingRule(rule_match=rule_match, rule_target=rule_target)
         orm_session.add(rule)
         orm_session.commit()
         orm_session.close()
+        result_msg = "Rule successfully added"
+        if json_check():
+            return json_result(result_msg, 200)
         flash("Rule successfully added", "alert-success")
         return redirect("/rules")
 
@@ -353,14 +368,25 @@ def edit_rule(rule_id):
                       first()
     if rule is None:
         orm_session.close()
-        flash("Rule " + rule_id + " not found!", "alert-danger")
+        error_msg = "Rule " + rule_id + " not found!"
+        if json_check():
+            return json_error(error_msg, 404)
+        flash(error_msg, "alert-danger")
         return redirect("/rules")
     else:
-        rule.rule_target = request.form["target"]
-        rule.rule_match = request.form["match"]
+        # check, if data are form data or json
+        if request.get_json(silent=True) is not None:
+            rule.rule_target = request.json["rule_target"]
+            rule.rule_match = request.json["rule_match"]
+        else:
+            rule.rule_target = request.form["target"]
+            rule.rule_match = request.form["match"]
         orm_session.commit()
         orm_session.close()
-        flash("Rule successfully changed", "alert-success")
+        result_msg = "Rule successfully changed"
+        if json_check():
+            return json_result(result_msg, 200)
+        flash(result_msg, "alert-success")
         return redirect("/rules")
 
 @app.route("/rules/<rule_id>/delete")
@@ -370,13 +396,19 @@ def delete_rule(rule_id):
                       first()
     if rule is None:
         orm_session.close()
-        flash("Rule " + rule_id + " not found!", "alert-danger")
+        error_msg = "Rule " + rule_id + " not found!"
+        if json_check():
+            return json_error(error_msg, 404)
+        flash(error_msg, "alert-danger")
         return redirect("/rules")
     else:
         orm_session.delete(rule)
         orm_session.commit()
         orm_session.close()
-        flash("Rule successfully deleted", "alert-success")
+        result_msg = "Rule successfully deleted"
+        if json_check():
+            return json_result(result_msg, 200)
+        flash(result_msg, "alert-success")
         return redirect("/rules")
 
 

@@ -52,6 +52,13 @@ class ForwardingRule(Base):
     forwarding_entries = relationship("ForwardedAlarm", cascade="all, delete-orphan")
     target = relationship("Target")
 
+    def json_repr(self):
+        data = OrderedDict([
+            ("rule_id", self.rule_id),
+            ("rule_match", self.rule_match),
+            ("rule_target", self.rule_target)
+        ])
+        return json.dumps(data)
 
 class ForwardedAlarm(Base):
 
