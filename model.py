@@ -1,6 +1,8 @@
 """model of opennms_alarmforwarder
 """
 
+import json
+from collections import OrderedDict
 from sqlalchemy import create_engine
 from sqlalchemy import ForeignKey, ForeignKeyConstraint, Column, Integer, String, DateTime
 from sqlalchemy.types import Boolean
@@ -113,3 +115,13 @@ class Source(Base):
     source_status_unknown = 0
     source_status_up = 1
     source_status_down = 2
+
+    def json_repr(self):
+        data = OrderedDict([
+            ("source_name", self.source_name),
+            ("source_url", self.source_url),
+            ("source_user", self.source_user),
+            ("source_filter", self.source_filter),
+            ("source_status", self.source_status),
+        ])
+        return json.dumps(data)

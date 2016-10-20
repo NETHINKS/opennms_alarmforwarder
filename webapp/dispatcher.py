@@ -1,6 +1,7 @@
 import os
 from flask import Flask
 from flask import flash
+from flask import jsonify
 from flask import render_template
 from flask import request
 from flask import redirect
@@ -25,6 +26,8 @@ def get_source_list():
     orm_session = model.Session()
     sources = orm_session.query(model.Source).all()
     orm_session.close()
+    if json_check():
+        return jsonify([source.json_repr() for source in sources])
     return render_template("source_list.html.tpl", sources=sources)
 
 @app.route("/sources/<name>")
@@ -33,8 +36,13 @@ def get_source(name):
     source = orm_session.query(model.Source).filter(model.Source.source_name==name).first()
     orm_session.close()
     if source is None:
-        flash("Source " + name + " not found!", "alert-danger")
+        error_msg = "Source " + name + " not found!"
+        if json_check():
+            return json_error(error_msg, 404)
+        flash(error_msg, "alert-danger")
         return redirect("/sources")
+    if json_check():
+        return jsonify(source.json_repr())
     return render_template("source_view.html.tpl", source=source)
 
 @app.route("/sources/<name>/test")
@@ -43,16 +51,28 @@ def test_source(name):
     source = orm_session.query(model.Source).filter(model.Source.source_name==name).first()
     orm_session.close()
     if source is None:
-        flash("Source " + name + " not found!", "alert-danger")
+        error_msg = "Source " + name + " not found!"
+        if json_check():
+            return json_error(error_msg, 404)
+        flash(error_msg, "alert-danger")
         return redirect("/sources")
     recv = receiver.OpennmsReceiver(source)
     test_result = recv.test_connection()
+    result = {}
+    result["result_state"] = "failed"
+    result["result_msg"] = ""
     if test_result == 200:
-        flash("Test of source " + name + " successful: HTTP/" + str(test_result), "alert-success")
+        result["result_state"] = "success"
+        result["result_msg"] = "Test of source " + name + " successful: HTTP/" + str(test_result)
+        flash(result["result_msg"], "alert-success")
     elif test_result == -1:
-        flash("Test of source " + name + " failed: Error connecting to server", "alert-danger")
+        result["result_msg"] = "Test of source " + name + " failed: Error connecting to server"
+        flash(result["result_msg"], "alert-danger")
     else:
-        flash("Test of source " + name + " failed: HTTP/" + str(test_result), "alert-danger")
+        result["result_msg"] = "Test of source " + name + " failed: HTTP/" + str(test_result)
+        flash(result["result_msg"], "alert-danger")
+    if json_check():
+        return jsonify(result)
     return redirect("/sources")
 
 @app.route("/sources/<name>/edit", methods=['POST'])
@@ -61,35 +81,63 @@ def edit_source(name):
     source = orm_session.query(model.Source).filter(model.Source.source_name==name).first()
     if source is None:
         orm_session.close()
-        flash("Source " + name + " not found!", "alert-danger")
+        error_msg = "Source " + name + " not found!"
+        if json_check():
+            return json_error(error_msg, 404)
+        flash(error_msg, "alert-danger")
         return redirect("/sources")
     else:
-        # update source
-        source.source_url = request.form["url"]
-        source.source_user = request.form["user"]
-        source.source_password = request.form["password"]
-        source.source_filter = request.form["filter"]
-        orm_session.commit()
-        orm_session.close()
-        flash("Source " + name + " successfully changed", "alert-success")
-        return redirect("/sources")
+        # check, if data are form data or json
+        if request.get_json(silent=True) is not None:
+            # update source from json data
+            source.source_url = request.json["source_url"]
+            source.source_user = request.json["source_user"]
+            source.source_password = request.json["source_password"]
+            source.source_filter = request.json["source_filter"]
+            orm_session.commit()
+            orm_session.close()
+            result_msg = "Source " + name + " successfully changed"
+            return json_result(result_msg, 200)
+        else:
+            # update source from form data
+            source.source_url = request.form["url"]
+            source.source_user = request.form["user"]
+            source.source_password = request.form["password"]
+            source.source_filter = request.form["filter"]
+            orm_session.commit()
+            orm_session.close()
+            flash("Source " + name + " successfully changed", "alert-success")
+            return redirect("/sources")
 
 @app.route("/sources/add", methods=['POST'])
 def add_source():
-    source_name = request.form["name"]
-    source_url = request.form["url"]
-    source_user = request.form["user"]
-    source_password = request.form["password"]
-    source_filter = request.form["filter"]
-    orm_session = model.Session()
+    # check, if data are form data or json
+    if request.get_json(silent=True) is not None:
+        # add source from json data
+        source_name = request.json["source_name"]
+        source_url = request.json["source_url"]
+        source_user = request.json["source_user"]
+        source_password = request.json["source_password"]
+        source_filter = request.json["source_filter"]
+    else:
+        # add source from form data
+        source_name = request.form["name"]
+        source_url = request.form["url"]
+        source_user = request.form["user"]
+        source_password = request.form["password"]
+        source_filter = request.form["filter"]
     # add source
+    orm_session = model.Session()
     source = model.Source(source_name=source_name, source_url=source_url, source_user=source_user,
                           source_password=source_password, source_filter=source_filter,
                           source_status=model.Source.source_status_unknown)
     orm_session.add(source)
     orm_session.commit()
     orm_session.close()
-    flash("Source " + source_name + " successfully added", "alert-success")
+    message = "Source " + source_name + " successfully added"
+    if json_check():
+        return json_result(message, 200)
+    flash(message, "alert-success")
     return redirect("/sources")
 
 @app.route("/sources/<name>/delete")
@@ -98,13 +146,19 @@ def delete_source(name):
     source = orm_session.query(model.Source).filter(model.Source.source_name==name).first()
     if source is None:
         orm_session.close()
-        flash("Source " + name + " not found!", "alert-danger")
+        message = "Source " + name + " not found!"
+        if json_check():
+            return json_error(message, 404)
+        flash(message, "alert-danger")
         return redirect("/sources")
     else:
         orm_session.delete(source)
         orm_session.commit()
         orm_session.close()
-        flash("Source " + name + " successfully deleted", "alert-success")
+        message = "Source " + name + " successfully deleted"
+        if json_check():
+            return json_result(message, 200)
+        flash(message, "alert-success")
         return redirect("/sources")
 
 
@@ -282,3 +336,24 @@ def delete_rule(rule_id):
         orm_session.close()
         flash("Rule successfully deleted", "alert-success")
         return redirect("/rules")
+
+
+
+def json_check():
+    """helper method: check if client requests JSON output"""
+    best_mime = request.accept_mimetypes.best_match(["application/json", "text/html"])
+    if best_mime == "application/json":
+        return True
+    return False
+
+def json_error(error_msg, error_code):
+    output = {}
+    output["error_code"] = error_code
+    output["error_msg"] = error_msg
+    return jsonify(output), error_code
+
+def json_result(result_msg, result_code):
+    output = {}
+    output["result_code"] = result_code
+    output["result_msg"] = result_msg
+    return jsonify(output), result_code
