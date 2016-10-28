@@ -6,6 +6,7 @@ This module defines the scheduler part of opennms_alarmforwarder
 import datetime
 import time
 from sqlalchemy.sql import exists
+from sqlalchemy.orm import joinedload
 import model
 from model import ActiveAlarm
 from model import ForwardedAlarm
@@ -55,7 +56,9 @@ class Scheduler(object):
                     for parameter in parameters_onms[alarm_id]:
                         orm_session.merge(parameter)
                 # remove non existing alarms from database table
-                query_saved_alarms = orm_session.query(model.ActiveAlarm).filter(model.ActiveAlarm.alarm_source==source.source_name).all()
+                query_saved_alarms = orm_session.query(model.ActiveAlarm).\
+                                     options(joinedload("parameters")).\
+                                     filter(model.ActiveAlarm.alarm_source==source.source_name).all()
                 for alarm_saved in query_saved_alarms:
                     try:
                         alarms_onms[str(alarm_saved.alarm_id)]
@@ -92,7 +95,8 @@ class Scheduler(object):
             query_forwarding_alarms = orm_session.query(ForwardedAlarm, ActiveAlarm).\
                                       filter(ForwardedAlarm.forwarded==False).\
                                       filter(ForwardedAlarm.alarm_id==ActiveAlarm.alarm_id).\
-                                      filter(ForwardedAlarm.alarm_source==ActiveAlarm.alarm_source)
+                                      filter(ForwardedAlarm.alarm_source==ActiveAlarm.alarm_source).\
+                                      options(joinedload("alarm.parameters"))
             for alarm_forwarding, alarm_active in query_forwarding_alarms.all():
                 # check forwarding of alarms
                 time_diff_obj = datetime.datetime.now() - alarm_active.alarm_timestamp

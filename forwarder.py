@@ -53,8 +53,20 @@ class Forwarder(object):
             except:
                 pass
             return replaced_var
+
+        def substitute_parm(match):
+            replaced_var = match.group(0)
+            try:
+                for alarm_parm in alarm.parameters:
+                    if alarm_parm.parm_name == match.group(1):
+                        replaced_var = alarm_parm.parm_value
+            except:
+                pass
+            return replaced_var
+
         output = input_string
-        output = re.sub("%(alarm_.*?)%", substitute_var, input_string)
+        output = re.sub("%(alarm_.*?)%", substitute_var, output)
+        output = re.sub("%parm_(.*?)%", substitute_parm, output)
         return output
 
     def test_forwarder(self):
