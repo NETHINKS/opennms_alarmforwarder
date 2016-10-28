@@ -37,7 +37,9 @@ class Scheduler(object):
 
                 # try to get alarms from OpenNMS
                 try:
-                    alarms_onms = receiver.get_alarms()
+                    alarm_data_onms = receiver.get_alarms()
+                    alarms_onms = alarm_data_onms["alarms"]
+                    parameters_onms = alarm_data_onms["parameters"]
                 except:
                     source.source_status = model.Source.source_status_down
                     orm_session.commit()
@@ -48,6 +50,10 @@ class Scheduler(object):
                 for alarm_id in alarms_onms:
                     alarm = alarms_onms[alarm_id]
                     orm_session.merge(alarm)
+                # add/update alarm parameters to/in database table
+                for alarm_id in parameters_onms:
+                    for parameter in parameters_onms[alarm_id]:
+                        orm_session.merge(parameter)
                 # remove non existing alarms from database table
                 query_saved_alarms = orm_session.query(model.ActiveAlarm).filter(model.ActiveAlarm.alarm_source==source.source_name).all()
                 for alarm_saved in query_saved_alarms:

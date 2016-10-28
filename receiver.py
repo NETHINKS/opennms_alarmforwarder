@@ -37,10 +37,10 @@ class OpennmsReceiver(object):
         return response.status_code
 
     def get_alarms(self):
-        """Get all alarms from OpenNMS and return a map with
-        alarm_id -> model.ActiveAlarm objects
+        """Get all alarms from OpenNMS and return a map with alarm_data
         """
         alarms = {}
+        parameters = {}
 
         # config
         config_rest_url = self.__source.source_url
@@ -91,11 +91,28 @@ class OpennmsReceiver(object):
             for operinstruct in alarm.findall("./operinstruct"):
                 alarm_operinstruct = operinstruct.text
             for timestamp in alarm.findall("./firstEventTime"):
-                # parse date example 2016-08-15T15:00:03.208-04:00
-                # ignore timezone
-                alarm_timestamp = datetime.datetime.strptime(timestamp.text[:-6],
-                                                             "%Y-%m-%dT%H:%M:%S.%f")
+                try:
+                    # parse date example 2016-08-15T15:00:03.208-04:00
+                    # ignore timezone
+                    alarm_timestamp = datetime.datetime.strptime(timestamp.text[:-6],
+                                                                 "%Y-%m-%dT%H:%M:%S.%f")
+                except:
+                    # parse date example 2016-08-15T15:00:03-04:00
+                    alarm_timestamp = datetime.datetime.strptime(timestamp.text[:-6],
+                                                                 "%Y-%m-%dT%H:%M:%S")
 
+            # parse alarm parameters
+            alarm_parameters = []
+            for parameter in alarm.findall("./parameters/parameter"):
+                parm_name = parameter.attrib["name"]
+                parm_value = parameter.attrib["value"]
+                created_alarm_parm = model.ActiveAlarmParm(
+                    alarm_id=alarm_id,
+                    alarm_source=self.__source.source_name,
+                    parm_name=parm_name,
+                    parm_value=parm_value
+                )
+                alarm_parameters.append(created_alarm_parm)
 
             # create alarm
             created_alarm = model.ActiveAlarm(
@@ -112,6 +129,10 @@ class OpennmsReceiver(object):
                 alarm_operinstruct=alarm_operinstruct
             )
             alarms[alarm_id] = created_alarm
+            parameters[alarm_id] =  alarm_parameters
 
-        # return alarm map
-        return alarms
+        # return alarm_data map
+        alarm_data = {}
+        alarm_data["alarms"] = alarms
+        alarm_data["parameters"] = parameters
+        return alarm_data

@@ -30,6 +30,7 @@ class ActiveAlarm(Base):
     alarm_description = Column(String)
     alarm_operinstruct = Column(String)
 
+    parameters = relationship("ActiveAlarmParm", cascade="all, delete-orphan")
     forwarding_entries = relationship("ForwardedAlarm", cascade="all, delete-orphan")
     source = relationship("Source")
 
@@ -39,6 +40,20 @@ class ActiveAlarm(Base):
         output += " Time: " + str(self.alarm_timestamp)
         output += " Logmessage: " + self.alarm_logmsg
         return output
+
+
+class ActiveAlarmParm(Base):
+
+    __tablename__ = "active_alarm_parm"
+
+    alarm_id = Column(Integer, primary_key=True)
+    alarm_source = Column(String, primary_key=True)
+    parm_name = Column(String, primary_key=True)
+    parm_value = Column(String)
+
+    __table_args__ = (ForeignKeyConstraint(["alarm_id", "alarm_source"], ["active_alarm.alarm_id", "active_alarm.alarm_source"]), {})
+
+    alarm = relationship("ActiveAlarm")
 
 
 class ForwardingRule(Base):
