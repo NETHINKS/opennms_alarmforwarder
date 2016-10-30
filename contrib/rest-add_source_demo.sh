@@ -9,6 +9,7 @@ JSON_DATA="{\"source_name\": \"Demo\", \
 curl \
     -Haccept:application/json \
     -Hcontent-type:application/json \
+    --user admin:admin \
     -X POST \
     --data "${JSON_DATA}" \
     http://localhost:5000/sources/add

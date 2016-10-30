@@ -4,6 +4,10 @@ from functools import wraps
 from flask import redirect
 from flask import request
 from flask import session
+from webapp.json_helper import json_check
+from webapp.json_helper import json_result
+from webapp.json_helper import json_error
+
 
 class AuthenticationHandler(object):
 
@@ -15,8 +19,21 @@ class AuthenticationHandler(object):
                 username = session["username"]
                 return func(*args, **kwargs)
             except:
-                # on error: redirect to login page
-                return redirect("/login")
+                pass
+
+            # allow HTTP basic auth
+            try:
+                user_basic = request.authorization.username
+                password_basic = request.authorization.password
+                if AuthenticationHandler.authenticate(user_basic, password_basic):
+                    return func(*args, **kwargs)
+            except:
+                pass
+
+            # on error: redirect to login page or return HTTP/401
+            if json_check():
+                return json_error("Unauthenticated", 401)
+            return redirect("/login")
         return handle_login_required
 
 

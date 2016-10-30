@@ -1,4 +1,5 @@
 #! /bin/bash
 
 curl -Haccept:application/json \
-    http://localhost:5000/targets/test/delete
+    --user admin:admin \
+    http://localhost:5000/targets
