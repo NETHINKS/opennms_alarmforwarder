@@ -5,6 +5,7 @@ from flask import jsonify
 from flask import render_template
 from flask import request
 from flask import redirect
+from flask import session
 from flask import url_for
 from sqlalchemy.orm import joinedload
 import model
@@ -31,7 +32,13 @@ def login():
         username = request.form["username"]
         password = request.form["password"]
         if AuthenticationHandler.login(username, password):
-            return redirect("/")
+            redirect_path = "/"
+            try:
+                redirect_path = session["redirect"]
+                del session["redirect"]
+            except:
+                pass
+            return redirect(redirect_path)
         else:
             error_msg = "Sorry, username or password wrong."
             flash(error_msg, "alert-danger")

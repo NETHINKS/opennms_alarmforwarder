@@ -33,6 +33,7 @@ class AuthenticationHandler(object):
             # on error: redirect to login page or return HTTP/401
             if json_check():
                 return json_error("Unauthenticated", 401)
+            session["redirect"] = request.full_path
             return redirect("/login")
         return handle_login_required
 
