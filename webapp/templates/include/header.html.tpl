@@ -23,14 +23,17 @@
                     <a class="navbar-brand" href="#">AlarmForwarder</a>
                 </div>
 
+                {% if session.username %}
                 <div class="collapse navbar-collapse" id="navbar-collapse-1">
                     <ul class="nav navbar-nav">
                         <li><a href="/">Home</a></li>
                         <li><a href="/sources">Sources</a></li>
                         <li><a href="/targets">Targets</a></li>
                         <li><a href="/rules">Forwarding Rules</a></li>
+                        <li><a href="/logout">{{ session.username }} Logout</a></li>
                     </ul>
                 </div>
+                {% endif %}
             </div>
         </nav>
         {% with messages = get_flashed_messages(with_categories=True) %}

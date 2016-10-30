@@ -10,6 +10,7 @@ from sqlalchemy.orm import joinedload
 import model
 import forwarder
 import receiver
+from webapp.auth import AuthenticationHandler
 
 basedir = os.path.dirname(__file__)
 app = Flask("opennms_alarmforwarder", template_folder=basedir+"/templates",
@@ -17,12 +18,32 @@ app = Flask("opennms_alarmforwarder", template_folder=basedir+"/templates",
 app.secret_key = 'msdniuf7go832gfvzuztcur65'
 
 @app.route("/")
+@AuthenticationHandler.login_required
 def index():
     return render_template("index.html.tpl")
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        username = request.form["username"]
+        password = request.form["password"]
+        if AuthenticationHandler.login(username, password):
+            return redirect("/")
+        else:
+            error_msg = "Sorry, username or password wrong."
+            flash(error_msg, "alert-danger")
+    return render_template("login.html.tpl")
+
+@app.route("/logout")
+@AuthenticationHandler.login_required
+def logout():
+    AuthenticationHandler.logout()
+    return redirect("/")
 
 
 
 @app.route("/sources")
+@AuthenticationHandler.login_required
 def get_source_list():
     orm_session = model.Session()
     sources = orm_session.query(model.Source).all()
@@ -32,6 +53,7 @@ def get_source_list():
     return render_template("source_list.html.tpl", sources=sources)
 
 @app.route("/sources/<name>")
+@AuthenticationHandler.login_required
 def get_source(name):
     orm_session = model.Session()
     source = orm_session.query(model.Source).filter(model.Source.source_name==name).first()
@@ -47,6 +69,7 @@ def get_source(name):
     return render_template("source_view.html.tpl", source=source)
 
 @app.route("/sources/<name>/test")
+@AuthenticationHandler.login_required
 def test_source(name):
     orm_session = model.Session()
     source = orm_session.query(model.Source).filter(model.Source.source_name==name).first()
@@ -77,6 +100,7 @@ def test_source(name):
     return redirect("/sources")
 
 @app.route("/sources/<name>/edit", methods=['POST'])
+@AuthenticationHandler.login_required
 def edit_source(name):
     orm_session = model.Session()
     source = orm_session.query(model.Source).filter(model.Source.source_name==name).first()
@@ -111,6 +135,7 @@ def edit_source(name):
             return redirect("/sources")
 
 @app.route("/sources/add", methods=['POST'])
+@AuthenticationHandler.login_required
 def add_source():
     # check, if data are form data or json
     if request.get_json(silent=True) is not None:
@@ -142,6 +167,7 @@ def add_source():
     return redirect("/sources")
 
 @app.route("/sources/<name>/delete")
+@AuthenticationHandler.login_required
 def delete_source(name):
     orm_session = model.Session()
     source = orm_session.query(model.Source).filter(model.Source.source_name==name).first()
@@ -165,6 +191,7 @@ def delete_source(name):
 
 
 @app.route("/targets")
+@AuthenticationHandler.login_required
 def get_target_list():
     orm_session = model.Session()
     targets = orm_session.query(model.Target).options(joinedload("target_parms")).all()
@@ -176,6 +203,7 @@ def get_target_list():
                            forwarder_classes=forwarder_classes)
 
 @app.route("/targets/<name>")
+@AuthenticationHandler.login_required
 def get_target(name):
     orm_session = model.Session()
     target = orm_session.query(model.Target).options(joinedload("target_parms")).filter(model.Target.target_name==name).first()
@@ -192,6 +220,7 @@ def get_target(name):
         return render_template("target_view.html.tpl", target=target)
 
 @app.route("/targets/<name>/test")
+@AuthenticationHandler.login_required
 def test_target(name):
     orm_session = model.Session()
     target = orm_session.query(model.Target).options(joinedload("target_parms")).filter(model.Target.target_name==name).first()
@@ -212,6 +241,7 @@ def test_target(name):
         return redirect("/targets")
 
 @app.route("/targets/<name>/delete")
+@AuthenticationHandler.login_required
 def delete_target(name):
     orm_session = model.Session()
     target = orm_session.query(model.Target).filter(model.Target.target_name==name).first()
@@ -233,6 +263,7 @@ def delete_target(name):
         return redirect("/targets")
 
 @app.route("/targets/add", methods=['POST'])
+@AuthenticationHandler.login_required
 def add_target():
     parameters = {}
     # check, if data are form data or json
@@ -272,6 +303,7 @@ def add_target():
         return redirect("/targets")
 
 @app.route("/targets/<name>/edit", methods=['POST'])
+@AuthenticationHandler.login_required
 def edit_target(name):
     orm_session = model.Session()
     target = orm_session.query(model.Target).filter(model.Target.target_name==name).first()
@@ -310,6 +342,7 @@ def edit_target(name):
 
 
 @app.route("/rules")
+@AuthenticationHandler.login_required
 def get_rule_list():
     orm_session = model.Session()
     rules = orm_session.query(model.ForwardingRule).all()
@@ -319,6 +352,7 @@ def get_rule_list():
     return render_template("rule_list.html.tpl", rules=rules)
 
 @app.route("/rules/<rule_id>")
+@AuthenticationHandler.login_required
 def get_rule(rule_id):
     orm_session = model.Session()
     targets = orm_session.query(model.Target).all()
@@ -336,6 +370,7 @@ def get_rule(rule_id):
     return render_template("rule_view.html.tpl", rule=rule, targets=targets)
 
 @app.route("/rules/add", methods=['GET', 'POST'])
+@AuthenticationHandler.login_required
 def add_rule():
     if request.method == 'GET':
         orm_session = model.Session()
@@ -362,6 +397,7 @@ def add_rule():
         return redirect("/rules")
 
 @app.route("/rules/<rule_id>/edit", methods=['POST'])
+@AuthenticationHandler.login_required
 def edit_rule(rule_id):
     orm_session = model.Session()
     rule = orm_session.query(model.ForwardingRule).filter(model.ForwardingRule.rule_id==rule_id).\
@@ -390,6 +426,7 @@ def edit_rule(rule_id):
         return redirect("/rules")
 
 @app.route("/rules/<rule_id>/delete")
+@AuthenticationHandler.login_required
 def delete_rule(rule_id):
     orm_session = model.Session()
     rule = orm_session.query(model.ForwardingRule).filter(model.ForwardingRule.rule_id==rule_id).\
