@@ -42,7 +42,7 @@ Provider:
         TicketCreate:
           Route: /TicketCreate
         TicketUpdate:
-          Route: TicketUpdate
+          Route: /TicketUpdate/:TicketID
     Type: HTTP::REST
 RemoteSystem: ''
 Requester:

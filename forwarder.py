@@ -76,7 +76,7 @@ class Forwarder(object):
     def forward_alarm(self, alarm):
         pass
 
-    def resolve_alarm(self, alarm):
+    def resolve_alarm(self, alarm, reference=None):
         pass
 
 
@@ -94,7 +94,7 @@ class StdoutForwarder(Forwarder):
         alarm_string = self.substitute_alarm_variables(self.get_parameter("AlertMessage"), alarm)
         print(alarm_string)
 
-    def resolve_alarm(self, alarm):
+    def resolve_alarm(self, alarm, reference=None):
         alarm_string = self.substitute_alarm_variables(self.get_parameter("ResolvedMessage"), alarm)
         print(alarm_string)
 
@@ -118,7 +118,7 @@ class SmsEagleForwarder(Forwarder):
         message = self.substitute_alarm_variables(self.get_parameter("messageFormatAlarm"), alarm)
         self.send_message(message)
 
-    def resolve_alarm(self, alarm):
+    def resolve_alarm(self, alarm, reference=None):
         message = self.substitute_alarm_variables(self.get_parameter("messageFormatResolved"), alarm)
         self.send_message(message)
 
@@ -172,7 +172,7 @@ class EmailForwarder(Forwarder):
         message = self.substitute_alarm_variables(self.get_parameter("messageFormatAlarm"), alarm)
         self.send_message(subject, message)
 
-    def resolve_alarm(self, alarm):
+    def resolve_alarm(self, alarm, reference=None):
         subject = self.substitute_alarm_variables(self.get_parameter("subjectFormatResolved"), alarm)
         message = self.substitute_alarm_variables(self.get_parameter("messageFormatResolved"), alarm)
         self.send_message(subject, message)
@@ -217,7 +217,8 @@ class OtrsTicketForwarder(Forwarder):
         ("subjectFormatAlarm", "Alarm: %alarm_uei%"),
         ("subjectFormatResolved", "Resolved: %alarm_uei%"),
         ("messageFormatAlarm", "Alarm:\r\n %alarm_logmsg%"),
-        ("messageFormatResolved", "The alarm was resolved.")
+        ("messageFormatResolved", "The alarm was resolved."),
+        ("closeTickets", "true")
     ])
 
     def test_forwarder(self):
@@ -228,13 +229,16 @@ class OtrsTicketForwarder(Forwarder):
     def forward_alarm(self, alarm):
         subject = self.substitute_alarm_variables(self.get_parameter("subjectFormatAlarm"), alarm)
         message = self.substitute_alarm_variables(self.get_parameter("messageFormatAlarm"), alarm)
-        self.create_ticket(subject, message)
+        ticket_id = self.create_ticket(subject, message)
+        return ticket_id
 
-    def resolve_alarm(self, alarm):
-        pass
+    def resolve_alarm(self, alarm, reference=None):
+        subject = self.substitute_alarm_variables(self.get_parameter("subjectFormatResolved"), alarm)
+        message = self.substitute_alarm_variables(self.get_parameter("messageFormatResolved"), alarm)
+        self.update_ticket(reference, subject, message)
 
     def create_ticket(self, subject, message):
-        result_ticketno = "0"
+        result_ticketid = "0"
         url = self.get_parameter("otrsRestUrl")
         user = self.get_parameter("otrsRestUser")
         password = self.get_parameter("otrsRestPassword")
@@ -268,11 +272,51 @@ class OtrsTicketForwarder(Forwarder):
             else:
                 response_data = json.loads(response.text)
                 try:
-                    result_ticketno = response_data["TicketNumber"]
+                    result_ticketid = response_data["TicketID"]
+                    self._logger.info("Ticket %s successfully created", result_ticketid)
                 except:
                     self._logger.error("Could not create ticket")
-                self._logger.info("Ticket %s successfully created", result_ticketno)
         except:
             self._logger.error("Could not connect to OTRS")
 
-        return result_ticketno
+        return result_ticketid
+
+    def update_ticket(self, ticket_id, subject, message):
+        result_ticketid = "0"
+        url = self.get_parameter("otrsRestUrl")
+        user = self.get_parameter("otrsRestUser")
+        password = self.get_parameter("otrsRestPassword")
+        queue = self.get_parameter("otrsQueue")
+
+        request_url = "%s/TicketUpdate/%s?UserLogin=%s&Password=%s" % (url, ticket_id, user, password)
+        request_headers = {
+            "Content-Type": "application/json"
+        }
+        request_data = {}
+        if self.get_parameter("closeTickets") == "true":
+            request_data["Ticket"] = {}
+            request_data["Ticket"]["State"] = "closed successful"
+        request_data["Article"] = {}
+        request_data["Article"]["Subject"] = subject
+        request_data["Article"]["Body"] = message
+        request_data["Article"]["ContentType"] = "text/plain; charset=utf8"
+        request_data_json = json.dumps(request_data)
+
+        try:
+            requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+            response = requests.patch(request_url, data=request_data_json, headers=request_headers,
+                                      verify=False)
+            # check response
+            if response.status_code != 200:
+                self._logger.error("Could not update ticket")
+            else:
+                response_data = json.loads(response.text)
+                try:
+                    result_ticketid = response_data["TicketID"]
+                    self._logger.info("Ticket %s successfully updated", result_ticketid)
+                except:
+                    self._logger.error("Could not update ticket")
+        except:
+            self._logger.error("Could not connect to OTRS")
+
+        return result_ticketid

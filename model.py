@@ -83,6 +83,7 @@ class ForwardedAlarm(Base):
     alarm_source = Column(String, primary_key=True)
     rule_id = Column(Integer, ForeignKey("forwarding_rule.rule_id"), primary_key=True)
     forwarded = Column(Boolean)
+    forwarder_reference = Column(String)
 
     __table_args__ = (ForeignKeyConstraint(["alarm_id", "alarm_source"], ["active_alarm.alarm_id", "active_alarm.alarm_source"]), {})
 

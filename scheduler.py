@@ -68,7 +68,7 @@ class Scheduler(object):
                             if forwarding_entry.forwarded:
                                 target = forwarding_entry.rule.target
                                 forwarder = Forwarder.create_forwarder(target.target_name, target.target_class, target.target_parms)
-                                forwarder.resolve_alarm(alarm_saved)
+                                forwarder.resolve_alarm(alarm_saved, forwarding_entry.forwarder_reference)
                         # remove alarm
                         orm_session.delete(alarm_saved)
                 orm_session.commit()
@@ -86,7 +86,8 @@ class Scheduler(object):
                             alarm_id=alarm_saved.alarm_id,
                             alarm_source=alarm_saved.alarm_source,
                             rule_id=rule.rule_id,
-                            forwarded=False
+                            forwarded=False,
+                            forwarder_reference=None
                         )
                         orm_session.add(forwarded_alarm)
             orm_session.commit()
@@ -105,7 +106,7 @@ class Scheduler(object):
                     # forward alarm
                     target = alarm_forwarding.rule.target
                     forwarder = Forwarder.create_forwarder(target.target_name, target.target_class, target.target_parms)
-                    forwarder.forward_alarm(alarm_active)
+                    alarm_forwarding.forwarder_reference = forwarder.forward_alarm(alarm_active)
                     # set forwarded flag
                     alarm_forwarding.forwarded=True
             orm_session.commit()
