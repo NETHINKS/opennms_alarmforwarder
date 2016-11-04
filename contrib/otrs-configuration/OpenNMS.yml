@@ -1,0 +1,50 @@
+---
+Debugger:
+  DebugThreshold: error
+  TestMode: '0'
+Description: ''
+FrameworkVersion: 5.0.12
+Provider:
+  Operation:
+    TicketCreate:
+      Description: ''
+      MappingInbound:
+        Config:
+          KeyMapDefault:
+            MapTo: ''
+            MapType: Keep
+          ValueMapDefault:
+            MapTo: ''
+            MapType: Keep
+        Type: Simple
+      MappingOutbound:
+        Config:
+          KeyMapDefault:
+            MapTo: ''
+            MapType: Keep
+          ValueMapDefault:
+            MapTo: ''
+            MapType: Keep
+        Type: Simple
+      Type: Ticket::TicketCreate
+    TicketUpdate:
+      Description: ''
+      MappingInbound:
+        Type: Simple
+      MappingOutbound:
+        Type: Simple
+      Type: Ticket::TicketUpdate
+  Transport:
+    Config:
+      KeepAlive: ''
+      MaxLength: '4000000'
+      RouteOperationMapping:
+        TicketCreate:
+          Route: /TicketCreate
+        TicketUpdate:
+          Route: TicketUpdate
+    Type: HTTP::REST
+RemoteSystem: ''
+Requester:
+  Transport:
+    Type: ''

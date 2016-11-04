@@ -3,6 +3,7 @@
 import email
 from email.mime.text import MIMEText
 import inspect
+import json
 import logging
 import re
 import smtplib
@@ -136,14 +137,14 @@ class SmsEagleForwarder(Forwarder):
         try:
             requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
             response = requests.get(url, params=url_parameters)
+            # check response
+            if response.status_code != 200:
+                self._logger.error("Could not send SMS to %s: %s", target, message)
+            else:
+                self._logger.info("Send SMS to %s: %s", target, message)
         except:
             self._logger.error("Could not connect to SMS Eagle")
 
-        # check response
-        if response.status_code != 200:
-            self._logger.error("Could not send SMS to %s: %s", target, message)
-        else:
-            self._logger.info("Send SMS to %s: %s", target, message)
 
 
 class EmailForwarder(Forwarder):
@@ -204,3 +205,74 @@ class EmailForwarder(Forwarder):
             self._logger.info("Send mail to %s: subject: %s", to_address, subject)
         except:
             self._logger.error("Could not send mail to %s: subject: %s", to_address, message)
+
+class OtrsTicketForwarder(Forwarder):
+
+    default_parameters = OrderedDict([
+        ("otrsRestUrl", "http://localhost/otrs/nph-genericinterface.pl/Webservice/OpenNMS"),
+        ("otrsRestUser", "admin"),
+        ("otrsRestPassword", "admin"),
+        ("otrsQueue", "Raw"),
+        ("otrsCustomerMail", "test@example.com"),
+        ("subjectFormatAlarm", "Alarm: %alarm_uei%"),
+        ("subjectFormatResolved", "Resolved: %alarm_uei%"),
+        ("messageFormatAlarm", "Alarm:\r\n %alarm_logmsg%"),
+        ("messageFormatResolved", "The alarm was resolved.")
+    ])
+
+    def test_forwarder(self):
+        subject = "Test of opennms_alarmforwarder"
+        message = "This is a test of opennms_alarmforwarder. You can ignore this ticket."
+        self.create_ticket(subject, message)
+
+    def forward_alarm(self, alarm):
+        subject = self.substitute_alarm_variables(self.get_parameter("subjectFormatAlarm"), alarm)
+        message = self.substitute_alarm_variables(self.get_parameter("messageFormatAlarm"), alarm)
+        self.create_ticket(subject, message)
+
+    def resolve_alarm(self, alarm):
+        pass
+
+    def create_ticket(self, subject, message):
+        result_ticketno = "0"
+        url = self.get_parameter("otrsRestUrl")
+        user = self.get_parameter("otrsRestUser")
+        password = self.get_parameter("otrsRestPassword")
+        queue = self.get_parameter("otrsQueue")
+
+        request_url = "%s/TicketCreate?UserLogin=%s&Password=%s" % (url, user, password)
+        request_headers = {
+            "Content-Type": "application/json"
+        }
+        request_data = {}
+        request_data["Ticket"] = {}
+        request_data["Ticket"]["Title"] = subject
+        request_data["Ticket"]["Type"] = "Incident"
+        request_data["Ticket"]["Priority"] = "3 normal"
+        request_data["Ticket"]["Queue"] = "Raw"
+        request_data["Ticket"]["State"] = "open"
+        request_data["Ticket"]["CustomerUser"] = self.get_parameter("otrsCustomerMail")
+        request_data["Article"] = {}
+        request_data["Article"]["Subject"] = subject
+        request_data["Article"]["Body"] = message
+        request_data["Article"]["ContentType"] = "text/plain; charset=utf8"
+        request_data_json = json.dumps(request_data)
+
+        try:
+            requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+            response = requests.post(request_url, data=request_data_json, headers=request_headers,
+                                     verify=False)
+            # check response
+            if response.status_code != 200:
+                self._logger.error("Could not create ticket")
+            else:
+                response_data = json.loads(response.text)
+                try:
+                    result_ticketno = response_data["TicketNumber"]
+                except:
+                    self._logger.error("Could not create ticket")
+                self._logger.info("Ticket %s successfully created", result_ticketno)
+        except:
+            self._logger.error("Could not connect to OTRS")
+
+        return result_ticketno
