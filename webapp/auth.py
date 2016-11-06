@@ -7,9 +7,11 @@ from flask import session
 from webapp.json_helper import json_check
 from webapp.json_helper import json_result
 from webapp.json_helper import json_error
-
+import security
 
 class AuthenticationHandler(object):
+
+    authentication_provider = security.LocalUserAuthenticationProvider() 
 
     def login_required(func):
         @wraps(func)
@@ -25,7 +27,7 @@ class AuthenticationHandler(object):
             try:
                 user_basic = request.authorization.username
                 password_basic = request.authorization.password
-                if AuthenticationHandler.authenticate(user_basic, password_basic):
+                if AuthenticationHandler.authentication_provider.authenticate(user_basic, password_basic):
                     return func(*args, **kwargs)
             except:
                 pass
@@ -40,7 +42,7 @@ class AuthenticationHandler(object):
 
     def login(username, password):
         # try to authenticate the user
-        if AuthenticationHandler.authenticate(username, password):
+        if AuthenticationHandler.authentication_provider.authenticate(username, password):
             # set session variable
             session["username"] = username
             return True
@@ -53,10 +55,3 @@ class AuthenticationHandler(object):
             del session["username"]
         except:
             pass
-
-
-    # ToDo: implementation
-    def authenticate(username, password):
-        if password == "admin":
-            return True
-        return False

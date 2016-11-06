@@ -11,6 +11,7 @@ from sqlalchemy.orm import joinedload
 import model
 import forwarder
 import receiver
+import security
 from webapp.auth import AuthenticationHandler
 from webapp.json_helper import json_check
 from webapp.json_helper import json_result
@@ -49,6 +50,70 @@ def login():
 def logout():
     AuthenticationHandler.logout()
     return redirect("/")
+
+
+
+@app.route("/admin/users")
+@AuthenticationHandler.login_required
+def get_user_list():
+    local_auth_provider = security.LocalUserAuthenticationProvider()
+    users = local_auth_provider.list_users()
+    if json_check():
+        return jsonify([user.json_repr() for user in users])
+    return render_template("user_list.html.tpl", users=users)
+
+@app.route("/admin/users/add", methods=['POST'])
+@AuthenticationHandler.login_required
+def add_user():
+    # check, if data are form data or json
+    if request.get_json(silent=True) is not None:
+        # add source from json data
+        user_name = request.json["user_name"]
+        user_password = request.json["user_password"]
+    else:
+        # add source from form data
+        user_name = request.form["name"]
+        user_password = request.form["password"]
+    # add user
+    local_auth_provider = security.LocalUserAuthenticationProvider()
+    result = local_auth_provider.create_user(user_name, user_password)
+    if not result:
+        message = "Error adding user " + user_name
+        if json_check():
+            return json_error(message, 500)
+        flash(message, "alert-danger")
+    else:
+        message = "User " + user_name + " successfully added."
+        if json_check():
+            return json_result(message, 200)
+        flash(message, "alert-success")
+    return redirect("/admin/users")
+
+@app.route("/admin/users/<name>/delete")
+@AuthenticationHandler.login_required
+def delete_user(name):
+    if name == session["username"]:
+        message = "You cannot delete your own user account, please do not bite the hand that feeds you :-)"
+        if json_check():
+            return json_error(message, 500)
+        flash(message, "alert-danger")
+        return redirect("/admin/users")
+    local_auth_provider = security.LocalUserAuthenticationProvider()
+    result = local_auth_provider.delete_user(name)
+    if not result:
+        message = "User " + name + " not found!"
+        if json_check():
+            return json_error(message, 404)
+        flash(message, "alert-danger")
+        return redirect("/admin/users")
+    else:
+        message = "User " + name + " successfully deleted"
+        if json_check():
+            return json_result(message, 200)
+        flash(message, "alert-success")
+        return redirect("/admin/users")
+
+
 
 
 

@@ -155,3 +155,18 @@ class Source(Base):
             ("source_status", self.source_status),
         ])
         return json.dumps(data)
+
+
+class LocalUser(Base):
+
+    __tablename__ = "user"
+
+    user_name = Column(String, primary_key=True)
+    password_hash = Column(String)
+
+    def json_repr(self):
+        data = OrderedDict([
+            ("user_name", self.user_name)
+        ])
+        return json.dumps(data)
+

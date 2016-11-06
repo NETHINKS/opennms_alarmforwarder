@@ -10,7 +10,7 @@
 </ul>
 
 
-<h1>Sources</h1>
+<h1><span class="glyphicon glyphicon-log-in"></span>Sources</h1>
 
 <!-- modal: add new target -->
 <div class="modal fade" id="modalAddSource" role="dialog">

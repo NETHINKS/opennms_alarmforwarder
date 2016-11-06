@@ -4,7 +4,7 @@
     <li role="presentation"><a href="/rules/add">Add new Rule</a></li>
 </ul>
 
-<h1>Forwarding Rules</h1>
+<h1><span class="glyphicon glyphicon-random"></span>Forwarding Rules</h1>
 
 <table class="table table-default">
     <tr>

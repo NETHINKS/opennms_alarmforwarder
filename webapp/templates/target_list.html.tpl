@@ -10,7 +10,7 @@
 </ul>
 
 
-<h1>Targets</h1>
+<h1><span class="glyphicon glyphicon-log-out"></span>Targets</h1>
 
 <!-- modal: add new target -->
 <div class="modal fade" id="modalAddTarget" role="dialog">
