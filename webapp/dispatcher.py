@@ -294,9 +294,19 @@ def get_target(name):
             return jsonify(target.json_repr())
         return render_template("target_view.html.tpl", target=target)
 
-@app.route("/targets/<name>/test")
+@app.route("/targets/<name>/test", methods=["GET", "POST"])
 @AuthenticationHandler.login_required
 def test_target(name):
+    # check if message parameter is set
+    message = None
+    try:
+        message = request.json["message"]
+    except:
+        pass
+    try:
+        message = request.form["message"]
+    except:
+        pass
     orm_session = model.Session()
     target = orm_session.query(model.Target).options(joinedload("target_parms")).filter(model.Target.target_name==name).first()
     orm_session.close()
@@ -308,7 +318,7 @@ def test_target(name):
         return redirect("/targets")
     else:
         forwarder_obj = forwarder.Forwarder.create_forwarder(target.target_name, target.target_class, target.target_parms)
-        forwarder_obj.test_forwarder()
+        forwarder_obj.test_forwarder(message)
         result_msg = "Target " + name + " tested"
         if json_check():
             return json_result(result_msg, 200)

@@ -70,7 +70,7 @@ class Forwarder(object):
         output = re.sub("%parm_(.*?)%", substitute_parm, output)
         return output
 
-    def test_forwarder(self):
+    def test_forwarder(self, message=None):
         pass
 
     def forward_alarm(self, alarm):
@@ -87,8 +87,10 @@ class StdoutForwarder(Forwarder):
         ("ResolvedMessage", "Resolve alarm: %alarm_timestamp% %alarm_logmsg%")
     ])
 
-    def test_forwarder(self):
-        print("This is a test of the forwarder " + self._name)
+    def test_forwarder(self, message=None):
+        if not message:
+            message = "This is a test of the forwarder " + self._name
+        print(message)
 
     def forward_alarm(self, alarm):
         alarm_string = self.substitute_alarm_variables(self.get_parameter("AlertMessage"), alarm)
@@ -110,8 +112,9 @@ class SmsEagleForwarder(Forwarder):
         ("messageFormatResolved", "Resolved: %alarm_logmsg%")
     ])
 
-    def test_forwarder(self):
-        message = "This is a test of the forwarder " + self._name
+    def test_forwarder(self, message=None):
+        if not message:
+            message = "This is a test of the forwarder " + self._name
         self.send_message(message)
 
     def forward_alarm(self, alarm):
@@ -162,9 +165,10 @@ class EmailForwarder(Forwarder):
         ("messageFormatResolved", "Resolved:\r\n %alarm_logmsg%")
     ])
 
-    def test_forwarder(self):
-        subject = "Test of forwarder " + self._name
-        message = "This is a test of forwarder " + self._name
+    def test_forwarder(self, message=None):
+        subject = "OpenNMS AlarmForwarder message"
+        if not message:
+            message = "This is a test of forwarder " + self._name
         self.send_message(subject, message)
 
     def forward_alarm(self, alarm):
@@ -222,9 +226,10 @@ class OtrsTicketForwarder(Forwarder):
         ("closeTickets", "true")
     ])
 
-    def test_forwarder(self):
-        subject = "Test of opennms_alarmforwarder"
-        message = "This is a test of opennms_alarmforwarder. You can ignore this ticket."
+    def test_forwarder(self, message=None):
+        subject = "OpenNMS AlarmForwarder message"
+        if not message:
+            message = "This is a test of opennms_alarmforwarder. You can ignore this ticket."
         self.create_ticket(subject, message)
 
     def forward_alarm(self, alarm):
@@ -277,8 +282,6 @@ class OtrsTicketForwarder(Forwarder):
                 "Name": fieldname,
                 "Value":  additional_fields_map[fieldname]
             })
-            #request_data["DynamicField"]["Name"] = fieldname
-            #request_data["DynamicField"]["Value"] = additional_fields_map[fieldname]
         request_data_json = json.dumps(request_data)
 
         try:
