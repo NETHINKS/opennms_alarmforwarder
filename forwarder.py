@@ -214,6 +214,7 @@ class OtrsTicketForwarder(Forwarder):
         ("otrsRestPassword", "admin"),
         ("otrsQueue", "Raw"),
         ("otrsCustomerMail", "test@example.com"),
+        ("additionalFields", ""),
         ("subjectFormatAlarm", "Alarm: %alarm_uei%"),
         ("subjectFormatResolved", "Resolved: %alarm_uei%"),
         ("messageFormatAlarm", "Alarm:\r\n %alarm_logmsg%"),
@@ -229,7 +230,8 @@ class OtrsTicketForwarder(Forwarder):
     def forward_alarm(self, alarm):
         subject = self.substitute_alarm_variables(self.get_parameter("subjectFormatAlarm"), alarm)
         message = self.substitute_alarm_variables(self.get_parameter("messageFormatAlarm"), alarm)
-        ticket_id = self.create_ticket(subject, message)
+        additional_fields = self.substitute_alarm_variables(self.get_parameter("additionalFields"), alarm)
+        ticket_id = self.create_ticket(subject, message, additional_fields)
         return ticket_id
 
     def resolve_alarm(self, alarm, reference=None):
@@ -237,12 +239,21 @@ class OtrsTicketForwarder(Forwarder):
         message = self.substitute_alarm_variables(self.get_parameter("messageFormatResolved"), alarm)
         self.update_ticket(reference, subject, message)
 
-    def create_ticket(self, subject, message):
+    def create_ticket(self, subject, message, additional_fields):
         result_ticketid = "0"
         url = self.get_parameter("otrsRestUrl")
         user = self.get_parameter("otrsRestUser")
         password = self.get_parameter("otrsRestPassword")
         queue = self.get_parameter("otrsQueue")
+
+        # parse additional fields
+        additional_fields_map =  {}
+        for data in filter(None, additional_fields.split(";")):
+            match = re.match("(.*?)=(.*)", data)
+            if match:
+                data_field = match.group(1)
+                data_value = match.group(2)
+                additional_fields_map[data_field] = data_value
 
         request_url = "%s/TicketCreate?UserLogin=%s&Password=%s" % (url, user, password)
         request_headers = {
@@ -260,6 +271,14 @@ class OtrsTicketForwarder(Forwarder):
         request_data["Article"]["Subject"] = subject
         request_data["Article"]["Body"] = message
         request_data["Article"]["ContentType"] = "text/plain; charset=utf8"
+        request_data["DynamicField"] = []
+        for fieldname in additional_fields_map:
+            request_data["DynamicField"].append({
+                "Name": fieldname,
+                "Value":  additional_fields_map[fieldname]
+            })
+            #request_data["DynamicField"]["Name"] = fieldname
+            #request_data["DynamicField"]["Value"] = additional_fields_map[fieldname]
         request_data_json = json.dumps(request_data)
 
         try:
