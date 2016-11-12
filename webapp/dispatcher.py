@@ -59,7 +59,7 @@ def get_user_list():
     local_auth_provider = security.LocalUserAuthenticationProvider()
     users = local_auth_provider.list_users()
     if json_check():
-        return jsonify([user.json_repr() for user in users])
+        return jsonify(items=[user.json_repr() for user in users])
     return render_template("user_list.html.tpl", users=users)
 
 @app.route("/admin/users/add", methods=['POST'])
@@ -124,7 +124,7 @@ def get_source_list():
     sources = orm_session.query(model.Source).all()
     orm_session.close()
     if json_check():
-        return jsonify([source.json_repr() for source in sources])
+        return jsonify(items=[source.json_repr() for source in sources])
     return render_template("source_list.html.tpl", sources=sources)
 
 @app.route("/sources/<name>")
@@ -273,7 +273,7 @@ def get_target_list():
     forwarder_classes = forwarder.Forwarder.get_forwarder_classnames()
     orm_session.close()
     if json_check():
-        return jsonify([target.json_repr() for target in targets])
+        return jsonify(items=[target.json_repr() for target in targets])
     return render_template("target_list.html.tpl", targets=targets,
                            forwarder_classes=forwarder_classes)
 
@@ -433,7 +433,7 @@ def get_rule_list():
     rules = orm_session.query(model.ForwardingRule).all()
     orm_session.close()
     if json_check():
-        return jsonify([rule.json_repr() for rule in rules])
+        return jsonify(items=[rule.json_repr() for rule in rules])
     return render_template("rule_list.html.tpl", rules=rules)
 
 @app.route("/rules/<rule_id>")
