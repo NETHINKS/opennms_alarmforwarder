@@ -41,7 +41,7 @@
                     </div>
                     <div class="form-group">
                         <label for="inputFilter">Filter</label>
-                        <input type="text" class="form-control" id="inputFilter" name="filter" placeholder="">
+                        <input type="text" class="form-control" id="inputFilter" name="filter" placeholder="alarmAckUser IS NULL AND stickyMemo is NULL">
                     </div>
                     <button type="submit" class="btn btn-default">Submit</button>
                 </form>
