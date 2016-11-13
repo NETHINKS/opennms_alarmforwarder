@@ -1,7 +1,6 @@
 """model of opennms_alarmforwarder
 """
 
-import json
 from collections import OrderedDict
 from sqlalchemy import create_engine
 from sqlalchemy import ForeignKey, ForeignKeyConstraint, Column, Integer, String, DateTime
@@ -69,13 +68,13 @@ class ForwardingRule(Base):
     forwarding_entries = relationship("ForwardedAlarm", cascade="all, delete-orphan")
     target = relationship("Target")
 
-    def json_repr(self):
+    def dict_repr(self):
         data = OrderedDict([
             ("rule_id", self.rule_id),
             ("rule_match", self.rule_match),
             ("rule_target", self.rule_target)
         ])
-        return json.dumps(data)
+        return data
 
 class ForwardedAlarm(Base):
 
@@ -103,14 +102,14 @@ class Target(Base):
 
     forwarding_rules = relationship("ForwardingRule", cascade="all, delete-orphan")
 
-    def json_repr(self):
+    def dict_repr(self):
         data = OrderedDict([
             ("target_name", self.target_name),
             ("target_class", self.target_class),
             ("target_delay", self.target_delay),
             ("target_parms", {parm.parameter_name: parm.parameter_value for parm in self.target_parms})
         ])
-        return json.dumps(data)
+        return data
 
 class TargetParameter(Base):
 
@@ -140,7 +139,7 @@ class Source(Base):
     source_status_up = 1
     source_status_down = 2
 
-    def json_repr(self):
+    def dict_repr(self):
         data = OrderedDict([
             ("source_name", self.source_name),
             ("source_url", self.source_url),
@@ -148,7 +147,7 @@ class Source(Base):
             ("source_filter", self.source_filter),
             ("source_status", self.source_status),
         ])
-        return json.dumps(data)
+        return data
 
 
 class LocalUser(Base):
@@ -158,9 +157,9 @@ class LocalUser(Base):
     user_name = Column(String, primary_key=True)
     password_hash = Column(String)
 
-    def json_repr(self):
+    def dict_repr(self):
         data = OrderedDict([
             ("user_name", self.user_name)
         ])
-        return json.dumps(data)
+        return data
 
