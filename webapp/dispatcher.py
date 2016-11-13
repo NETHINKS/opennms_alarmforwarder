@@ -366,11 +366,12 @@ def add_target():
         target_delay = request.form["delay"]
         default_parameters = forwarder.Forwarder.get_default_parameters(target_class)
         for request_parm in request.form:
-            if request_parm != "action" and request_parm != "class" and request_parm != "name":
+            if request_parm not in ["action", "class", "name", "delay"]:
                 parameters[request_parm] = request.form[request_parm]
     if action == "show_form":
         return render_template("target_add.html.tpl", target_name=target_name,
-                               target_class=target_class, target_parameters=default_parameters)
+                               target_class=target_class, target_delay=target_delay,
+                               target_parameters=default_parameters)
     if action == "add":
         orm_session = model.Session()
         # add target

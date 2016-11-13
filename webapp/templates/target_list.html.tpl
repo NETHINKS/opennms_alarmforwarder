@@ -38,7 +38,7 @@
                     </div>
                     <div class="form-group">
                         <label for="inputDelay">Target Delay [sec]</label>
-                        <input type="text" class="form-control" id="inputDelay" name="delay" placeholder="Delay">
+                        <input type="number" class="form-control" id="inputDelay" name="delay" value="0" placeholder="Delay">
                     </div>
                     <button type="submit" class="btn btn-default">Submit</button>
                 </form>

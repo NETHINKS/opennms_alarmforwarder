@@ -14,7 +14,7 @@
     </div>
     <div class="form-group">
         <label for="inputDelay">Delay</label>
-        <input type="text" class="form-control" id="inputDelay" name="class" value="{{ target_delay }}">
+        <input type="number" class="form-control" id="inputDelay" name="delay" value="{{ target_delay }}">
     </div>
     {% for parm_name in target_parameters %}
      <div class="form-group">
