@@ -14,7 +14,7 @@ from webapp.dispatcher import app as wsgi_app
 
 def main():
     # get directory name
-    basedir = os.path.dirname(__file__)
+    basedir = os.path.dirname(os.path.abspath(__file__))
 
     # configure logging
     logging.basedir = basedir + "/logs"
@@ -22,9 +22,10 @@ def main():
 
     # init
     config = Config()
-    scheduler = Scheduler(config)
+    scheduler = Scheduler()
     webapp_conf = {
-        "bind": "0.0.0.0:5000"
+        "bind": config.get_value("Webserver", "bind", "0.0.0.0:5000"),
+        "workers": int(config.get_value("Webserver", "workers", "1"))
     }
     webapp = WebApplication(wsgi_app, webapp_conf)
 

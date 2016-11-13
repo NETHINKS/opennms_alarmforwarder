@@ -14,11 +14,12 @@ from model import ForwardingRule
 from rulematching import RuleEvaluator
 from forwarder import Forwarder
 from receiver import OpennmsReceiver
+import config
 
 class Scheduler(object):
 
-    def __init__(self, config):
-        self.__config = config
+    def __init__(self):
+        self.__config = config.Config()
 
     def run(self):
         # create objects
@@ -100,11 +101,11 @@ class Scheduler(object):
                                       options(joinedload("alarm.parameters"))
             for alarm_forwarding, alarm_active in query_forwarding_alarms.all():
                 # check forwarding of alarms
+                target = alarm_forwarding.rule.target
                 time_diff_obj = datetime.datetime.now() - alarm_active.alarm_timestamp
                 time_diff_sec = time_diff_obj.days * 86400 + time_diff_obj.seconds
-                if time_diff_sec >= 300:
+                if time_diff_sec >= target.target_delay:
                     # forward alarm
-                    target = alarm_forwarding.rule.target
                     forwarder = Forwarder.create_forwarder(target.target_name, target.target_class, target.target_parms)
                     alarm_forwarding.forwarder_reference = forwarder.forward_alarm(alarm_active)
                     # set forwarded flag
@@ -115,4 +116,4 @@ class Scheduler(object):
             orm_session.close()
 
             # wait time limit for the next scheduler run
-            time.sleep(30)
+            time.sleep(int(self.__config.get_value("Scheduler", "queryInterval", "30")))

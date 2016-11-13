@@ -12,6 +12,10 @@
         <label for="inputClass">Class</label>
         <input type="text" class="form-control" id="inputClass" name="class" value="{{ target_class }}">
     </div>
+    <div class="form-group">
+        <label for="inputDelay">Delay</label>
+        <input type="text" class="form-control" id="inputDelay" name="class" value="{{ target_delay }}">
+    </div>
     {% for parm_name in target_parameters %}
      <div class="form-group">
         <label for="input{{ parm_name }}">{{ parm_name }}</label>

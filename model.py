@@ -8,8 +8,10 @@ from sqlalchemy import ForeignKey, ForeignKeyConstraint, Column, Integer, String
 from sqlalchemy.types import Boolean
 from sqlalchemy.orm import relationship, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
+import config
 
-engine = create_engine("postgresql://alarmforwarder:alarmforwarder@localhost/alarmforwarder")
+__config = config.Config()
+engine = create_engine(__config.get_value("DatabaseConnection", "url", ""))
 Session = sessionmaker(bind=engine)
 Base = declarative_base()
 
@@ -90,22 +92,13 @@ class ForwardedAlarm(Base):
     alarm = relationship("ActiveAlarm")
     rule = relationship("ForwardingRule")
 
-
-class ConfigEntry(Base):
-
-    __tablename__ = "config"
-
-    config_section = Column(String, primary_key=True)
-    config_key = Column(String, primary_key=True)
-    config_value = Column(String)
-
-
 class Target(Base):
 
     __tablename__ = "target"
 
     target_name = Column(String, primary_key=True)
     target_class = Column(String)
+    target_delay = Column(Integer)
     target_parms = relationship("TargetParameter", cascade="all, delete-orphan")
 
     forwarding_rules = relationship("ForwardingRule", cascade="all, delete-orphan")
@@ -114,6 +107,7 @@ class Target(Base):
         data = OrderedDict([
             ("target_name", self.target_name),
             ("target_class", self.target_class),
+            ("target_delay", self.target_delay),
             ("target_parms", {parm.parameter_name: parm.parameter_value for parm in self.target_parms})
         ])
         return json.dumps(data)
