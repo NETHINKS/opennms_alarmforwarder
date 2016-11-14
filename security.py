@@ -1,9 +1,14 @@
 """authentication module"""
 
 import model
+import config
 import hashlib
+import ldap3
 
 class AuthenticationProvider(object):
+
+    def __init__(self):
+        self._config = config.Config()
 
     def authenticate(self, username, password):
         raise ImplementationError
@@ -62,3 +67,37 @@ class LocalUserAuthenticationProvider(AuthenticationProvider):
         salt = "opennms_alarmforwarder"
         password_string = salt + password
         return hashlib.sha256(password_string.encode("utf-8")).hexdigest()
+
+
+class LdapAuthenticationProvider(AuthenticationProvider):
+
+    def authenticate(self, username, password):
+        # get configuration options
+        conf_url = self._config.get_value("LdapAuthentication", "url", "")
+        conf_binddn = self._config.get_value("LdapAuthentication", "binddn", "")
+        conf_bindpw = self._config.get_value("LdapAuthentication", "bindpassword", "")
+        conf_basedn = self._config.get_value("LdapAuthentication", "basedn", "")
+        conf_searchfilter = self._config.get_value("LdapAuthentication", "searchfilter", "")
+
+        # connect to ldap server and bind
+        ldap_server = ldap3.Server(conf_url)
+        try:
+            ldap_connection = ldap3.Connection(ldap_server, conf_binddn, conf_bindpw, auto_bind=True)
+        except:
+            ldap_connection = False
+        if ldap_connection is False:
+            return False
+
+        # get dn for given username and try to bind with given password
+        ldap_searchfilter = conf_searchfilter.replace("%username%", username)
+        ldap_connection.search(conf_basedn, ldap_searchfilter)
+        for entry in ldap_connection.entries:
+            # try to bind with user dn
+            try:
+                result = ldap_connection_test = ldap3.Connection(ldap_server, entry.entry_get_dn(),
+                                                                 password, auto_bind=True)
+            except:
+                result = False
+            if result:
+                return True
+        return False
