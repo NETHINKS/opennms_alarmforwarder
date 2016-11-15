@@ -90,19 +90,27 @@ class LdapAuthenticationProvider(AuthenticationProvider):
         conf_bindpw = self._config.get_value("LdapAuthentication", "bindpassword", "")
         conf_basedn = self._config.get_value("LdapAuthentication", "basedn", "")
         conf_searchfilter = self._config.get_value("LdapAuthentication", "searchfilter", "")
+        ldap_searchfilter = conf_searchfilter.replace("%username%", username)
 
         # connect to ldap server and bind
         ldap_server = ldap3.Server(conf_url)
         try:
             ldap_connection = ldap3.Connection(ldap_server, conf_binddn, conf_bindpw, auto_bind=True)
-        except:
+        except Exception as e:
+            self._logger.error("LdapAuthenticationProvider: Failed to connect to LDAP server %s. Exception: %s",
+                               ldap_server, e)
             ldap_connection = False
         if ldap_connection is False:
             return False
+        self._logger.debug("LdapAuthenticationProvider: Connect to LDAP server %s successful", ldap_server)
 
         # get dn for given username and try to bind with given password
-        ldap_searchfilter = conf_searchfilter.replace("%username%", username)
-        ldap_connection.search(conf_basedn, ldap_searchfilter)
+        try:
+            ldap_connection.search(conf_basedn, ldap_searchfilter)
+        except Exception as e:
+            self._logger.error("LdapAuthenticationProvider: Failed to execute LDAP search %s. Exception: %s",
+                               ldap_searchfilter, e)
+            return False
         for entry in ldap_connection.entries:
             # try to bind with user dn
             try:
@@ -111,5 +119,7 @@ class LdapAuthenticationProvider(AuthenticationProvider):
             except:
                 result = False
             if result:
+                self._logger.info("LdapAuthenticationProvider: Login of user %s successful", username)
                 return True
+        self._logger.info("LdapAuthenticationProvider: Login of user %s failed", username)
         return False
