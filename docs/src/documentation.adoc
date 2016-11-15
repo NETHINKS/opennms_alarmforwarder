@@ -1,0 +1,135 @@
+= OpenNMS AlarmForwarder Guide
+Michael Batz <Michael.Batz@nethinks.com>
+:toc: left
+:toclevels: 2
+:icons: font
+:source-highlighter: pygments
+
+== Introduction
+OpenNMS AlarmForwarder is a small tool written in Python for doing notifications on OpenNMS alarms. In a configurable interval, alarms where read from one or multiple OpenNMS servers (using the OpenNMS REST API) and saved in a local database. You can define multiple targets for notifications (e.g. mail, SMS, OTRS ticket) and forwarding rules. The forwarding of alarms can be delayed and suppressed, if the alarm is resolved within this interval. A daemon handles the alarm forwarding and most of the configuration is done in a small WebUI (with REST API).
+
+== Setup
+
+=== Manually setup your environment
+AlarmForwarder is written in Python3. The following libraries are required:
+
+* requests
+* ldap3
+* gunicorn
+* flask
+* sqlalchemy
+* psycopg2
+
+The data were stored in a PostgreSQL database. Please create an empty database and fill in the connection parameters in _etc/alarmforwarder.conf_. To install the database schema, please execute the _install.py_ script:
+
+[source, bash]
+----
+./install.py
+----
+
+Now you can start AlarmForwarder by executing _opennms_alarmforwarder.py_:
+
+[source, bash]
+----
+./opennms_alarmforwarder.py
+----
+
+You can now log into the WebUI by accessing the URL http://<Host>:5000 with username _admin_ and password _admin_.
+
+
+=== Start a Docker Container
+
+
+== Configuration of the AlarmForwarder application
+The general behavior of the application is stored in configuration files in the _etc_ subdirectory. OpenNMS sources, targets for alarm forwarding and rules were configured in the WebUI. Please see the "Using AlarmForwarder" section. The following configuration files are available:
+
+* alarmforwarder.conf: general configuration
+* logging.conf: log configuration
+
+=== General configuration (_alarmforwarder.conf_)
+Please have a look at the following example of the alarmforwarder.conf file:
+
+[source, ini]
+.alarmforwarder.conf
+----
+[DatabaseConnection]
+url = postgresql://alarmforwarder:alarmforwarder@localhost/alarmforwarder
+
+[Webserver]
+bind = 0.0.0.0:5000
+workers = 2
+
+[Scheduler]
+queryInterval = 30
+
+[Security]
+authenticationProvider = LocalUserAuthenticationProvider
+
+[LdapAuthentication]
+url = ldaps://localhost:636
+bindDn = cn=reader,dc=example,dc=com
+bindPassword = secret1234
+baseDn = dc=example,dc=com
+searchfilter = (uid=%%username%%)
+----
+
+This configuration file is divided in multiple sections. A description of the parameters in the secions can be found below.
+
+==== [DatabaseConnection]
+
+*url*::
+  Database URL for the AlarmForwarder database.
+
+
+==== [Webserver]
+This section configures the integrated webserver.
+
+*bind*::
+  Address and port, the webserver should use.
+
+*workers*::
+  Number of worker processes.
+
+
+==== [Scheduler]
+
+*queryInterval*::
+  The interval (in seconds) that is used to check for new alarms from the configured OpenNMS setups.
+
+==== [Security]
+
+*authenticationProvider*::
+  The authentication mechanism that is used for the WebUI. At the moment the following providers are available: _LocalUserAuthenticationProvider_, _LdapAuthenticationProvider_.
+
+==== [LdapAuthentication]
+If you want to use LDAP authentication, you can define some parameters in this section.
+
+*url*::
+  URL of a LDAP server. If you want to configure multiple servers, please use the ";" sign. Example: ldaps://server1:636;ldaps://server2:636
+
+*bindDn*::
+  BindDN that is used for read access.
+
+*bindPassword*::
+  Password used for read access.
+
+*baseDn*::
+  BaseDN for finding users.
+
+*searchfilter*::
+  LDAP filter that is used for finding users. Please use the %%username%% string to use the inserted username.
+
+
+=== Logging configuration (_logging.conf_)
+In the file _logging.conf_, the logging of AlarmForwarder is configured. It is a standard Python logging configuration file in configparser format and understands all options, that are allowed here.
+
+For every part of AlarmForwarder (receiver, scheduler, forwarder, security), a logger is configured and can be changed to fit your needs.
+
+By default, the logs are written to files in the _logs_ subdirectory. Only warnings and errors from receiver and scheduler were logged and info messages of forwarder, which contains all forwarded messages.
+
+
+== Using AlarmForwarder
+
+
+== Support
+If you have questions, found a bug or have an idea to enhance AlarmForwarder, please open an issue at the https://github.com/NETHINKS/opennms_alarmforwarder[GitHub project].
