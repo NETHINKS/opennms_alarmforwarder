@@ -5,11 +5,13 @@ import config
 import hashlib
 import ldap3
 import sys
+import logging
 
 class AuthenticationProvider(object):
 
     def __init__(self):
         self._config = config.Config()
+        self._logger = logging.getLogger("security")
 
     def authenticate(self, username, password):
         raise ImplementationError
@@ -32,7 +34,9 @@ class LocalUserAuthenticationProvider(AuthenticationProvider):
                            filter(model.LocalUser.password_hash==password_hash).\
                            first()
         if user is not None:
+            self._logger.info("LocalUserAuthenticationProvider: Login of user %s successful", username)
             return True
+        self._logger.warn("LocalUserAuthenticationProvider: Login of user %s failed", username)
         return False
 
     def create_user(self, username, password):
