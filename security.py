@@ -92,17 +92,20 @@ class LdapAuthenticationProvider(AuthenticationProvider):
         conf_searchfilter = self._config.get_value("LdapAuthentication", "searchfilter", "")
         ldap_searchfilter = conf_searchfilter.replace("%username%", username)
 
-        # connect to ldap server and bind
-        ldap_server = ldap3.Server(conf_url)
+        # connect to ldap server pool and bind
+        ldap_server_urls = filter(None, conf_url.split(";"))
+        ldap_server_pool = []
+        for ldap_server_url in ldap_server_urls:
+            ldap_server_pool.append(ldap3.Server(ldap_server_url))
         try:
-            ldap_connection = ldap3.Connection(ldap_server, conf_binddn, conf_bindpw, auto_bind=True)
+            ldap_connection = ldap3.Connection(ldap_server_pool, conf_binddn, conf_bindpw, auto_bind=True)
         except Exception as e:
             self._logger.error("LdapAuthenticationProvider: Failed to connect to LDAP server %s. Exception: %s",
-                               ldap_server, e)
+                               ldap_server_pool, e)
             ldap_connection = False
         if ldap_connection is False:
             return False
-        self._logger.debug("LdapAuthenticationProvider: Connect to LDAP server %s successful", ldap_server)
+        self._logger.debug("LdapAuthenticationProvider: Connect to LDAP server %s successful", ldap_server_pool)
 
         # get dn for given username and try to bind with given password
         try:
@@ -114,7 +117,7 @@ class LdapAuthenticationProvider(AuthenticationProvider):
         for entry in ldap_connection.entries:
             # try to bind with user dn
             try:
-                result = ldap_connection_test = ldap3.Connection(ldap_server, entry.entry_get_dn(),
+                result = ldap_connection_test = ldap3.Connection(ldap_server_pool, entry.entry_get_dn(),
                                                                  password, auto_bind=True)
             except:
                 result = False
