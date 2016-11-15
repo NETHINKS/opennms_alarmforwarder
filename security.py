@@ -4,6 +4,7 @@ import model
 import config
 import hashlib
 import ldap3
+import sys
 
 class AuthenticationProvider(object):
 
@@ -12,6 +13,13 @@ class AuthenticationProvider(object):
 
     def authenticate(self, username, password):
         raise ImplementationError
+
+    def get_authprovider():
+        configuration = config.Config()
+        classname = configuration.get_value("Security", "authenticationProvider",
+                                            "LocalUserAuthenticationProvider")
+        classobj = getattr(sys.modules[__name__], classname)
+        return classobj()
 
 
 class LocalUserAuthenticationProvider(AuthenticationProvider):

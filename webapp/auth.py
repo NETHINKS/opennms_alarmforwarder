@@ -11,8 +11,6 @@ import security
 
 class AuthenticationHandler(object):
 
-    authentication_provider = security.LocalUserAuthenticationProvider() 
-
     def login_required(func):
         @wraps(func)
         def handle_login_required(*args, **kwargs):
@@ -27,7 +25,8 @@ class AuthenticationHandler(object):
             try:
                 user_basic = request.authorization.username
                 password_basic = request.authorization.password
-                if AuthenticationHandler.authentication_provider.authenticate(user_basic, password_basic):
+                authprovider = security.AuthenticationProvider.get_authprovider()
+                if authprovider.authenticate(user_basic, password_basic):
                     return func(*args, **kwargs)
             except:
                 pass
@@ -42,7 +41,8 @@ class AuthenticationHandler(object):
 
     def login(username, password):
         # try to authenticate the user
-        if AuthenticationHandler.authentication_provider.authenticate(username, password):
+        authprovider = security.AuthenticationProvider.get_authprovider()
+        if authprovider.authenticate(username, password):
             # set session variable
             session["username"] = username
             return True
