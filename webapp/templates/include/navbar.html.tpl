@@ -7,7 +7,12 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="#">AlarmForwarder</a>
+            <h1>
+                <a class="navbar-brand" href="/">
+                    <img src="/static/images/logo-small.png" alt="AlarmForwarder Logo" />
+                    AlarmForwarder
+                </a>
+            </h1>
         </div>
 
         <div class="collapse navbar-collapse navbar-right" id="navbar-collapse-1">

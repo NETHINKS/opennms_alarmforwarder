@@ -10,6 +10,7 @@
                     </div>
                     <div class="panel-body">
                         {% include 'include/messagebar.html.tpl' %}
+                        <img class="center-block" src="/static/images/logo.png" alt="AlarmForwarder Logo" />
                         <form method="post" action="/login" class="form-horizontal">
                             <!-- login form field: username -->
                             <div class="form-group">
