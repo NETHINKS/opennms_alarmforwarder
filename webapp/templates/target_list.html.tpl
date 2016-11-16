@@ -48,26 +48,28 @@
 
 
 <!-- table with all targets -->
-<table class="table table-default">
-    <tr>
-            <th>Name</th>
-            <th>Class</th>
-            <th>Delay [sec]</th>
-            <th>Action</th>
-    </tr>
-    {% for target in targets %}
+<div class="container">
+    <table class="table table-default">
         <tr>
-            <td>{{ target.target_name }}</td>
-            <td>{{ target.target_class }}</td>
-            <td>{{ target.target_delay }}</td>
-            <td>
-                <a href="/targets/{{ target.target_name }}/test"><span class="glyphicon glyphicon-ok"></span></a>
-                <a href="/targets/{{ target.target_name }}"><span class="glyphicon glyphicon-edit"></span></a>
-                <a href="/targets/{{ target.target_name }}/delete"><span class="glyphicon glyphicon-remove"></span></a>
-            </td>
+                <th>Name</th>
+                <th>Class</th>
+                <th>Delay [sec]</th>
+                <th>Action</th>
         </tr>
-    {% endfor %}
+        {% for target in targets %}
+            <tr>
+                <td>{{ target.target_name }}</td>
+                <td>{{ target.target_class }}</td>
+                <td>{{ target.target_delay }}</td>
+                <td>
+                    <a href="/targets/{{ target.target_name }}/test"><span class="glyphicon glyphicon-ok"></span></a>
+                    <a href="/targets/{{ target.target_name }}"><span class="glyphicon glyphicon-edit"></span></a>
+                    <a href="/targets/{{ target.target_name }}/delete"><span class="glyphicon glyphicon-remove"></span></a>
+                </td>
+            </tr>
+        {% endfor %}
 
-</table>
+    </table>
+</div>
 
 {% include 'include/footer.html.tpl' %}

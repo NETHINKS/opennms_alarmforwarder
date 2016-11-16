@@ -38,26 +38,25 @@
     </div>
 </div>
 
-
-<h1><span class="glyphicon glyphicon-random"></span>Forwarding Rules</h1>
-
-<table class="table table-default">
-    <tr>
-            <th>Rule</th>
-            <th>Target</th>
-            <th>Action</th>
-    </tr>
-    {% for rule in rules %}
+<div class="container">
+    <h1><span class="glyphicon glyphicon-random"></span>Forwarding Rules</h1>
+    <table class="table table-default">
         <tr>
-            <td>{{ rule.rule_match }}</td>
-            <td>{{ rule.rule_target }}</td>
-            <td>
-                <a href="/rules/{{ rule.rule_id }}"><span class="glyphicon glyphicon-edit"></span></a>
-                <a href="/rules/{{ rule.rule_id }}/delete"><span class="glyphicon glyphicon-remove"></span></a>
-            </td>
+                <th>Rule</th>
+                <th>Target</th>
+                <th>Action</th>
         </tr>
-    {% endfor %}
-
-</table>
+        {% for rule in rules %}
+            <tr>
+                <td>{{ rule.rule_match }}</td>
+                <td>{{ rule.rule_target }}</td>
+                <td>
+                    <a href="/rules/{{ rule.rule_id }}"><span class="glyphicon glyphicon-edit"></span></a>
+                    <a href="/rules/{{ rule.rule_id }}/delete"><span class="glyphicon glyphicon-remove"></span></a>
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+</div>
 
 {% include 'include/footer.html.tpl' %}

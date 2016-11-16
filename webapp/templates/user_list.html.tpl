@@ -39,21 +39,23 @@
 
 
 <!-- table with all users -->
-<table class="table table-default">
-    <tr>
-            <th>Username</th>
-            <th>Action</th>
-    </tr>
+<div class="container">
+    <table class="table table-default">
+        <tr>
+                <th>Username</th>
+                <th>Action</th>
+        </tr>
 
-    {% for user in users %}
-            <tr>
-                <td>{{ user.user_name }}</td>
-                <td>
-                    <a href="/admin/users/{{ user.user_name }}/delete"><span class="glyphicon glyphicon-remove"></span></a>
-                </td>
-            </tr>
-    {% endfor %}
+        {% for user in users %}
+                <tr>
+                    <td>{{ user.user_name }}</td>
+                    <td>
+                        <a href="/admin/users/{{ user.user_name }}/delete"><span class="glyphicon glyphicon-remove"></span></a>
+                    </td>
+                </tr>
+        {% endfor %}
 
-</table>
+    </table>
+</div>
 
 {% include 'include/footer.html.tpl' %}

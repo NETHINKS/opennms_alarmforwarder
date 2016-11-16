@@ -50,40 +50,42 @@
 
 
 <!-- table with all sources -->
-<h1><span class="glyphicon glyphicon-log-in"></span>Sources</h1>
-<table class="table table-default">
-    <tr>
-            <th>Status</th>
-            <th>Name</th>
-            <th>URL</th>
-            <th>Username</th>
-            <th>Filter</th>
-            <th>Action</th>
-    </tr>
+<div class="container">
+    <h1><span class="glyphicon glyphicon-log-in"></span>Sources</h1>
+    <table class="table table-default">
+        <tr>
+                <th>Status</th>
+                <th>Name</th>
+                <th>URL</th>
+                <th>Username</th>
+                <th>Filter</th>
+                <th>Action</th>
+        </tr>
 
-    {% for source in sources %}
-        {% if source.source_status == 2 %}
-            <tr class="danger">
-                <td><span class="glyphicon glyphicon-remove-sign"></span></td>
-        {% elif source.source_status == 1 %}
-            <tr class="success">
-                <td><span class="glyphicon glyphicon-ok-sign"></span></td>
-        {% else %}
-            <tr>
-                <td><span class="glyphicon glyphicon-question-sign"></span></td>
-        {% endif %}
-                <td>{{ source.source_name }}</td>
-                <td>{{ source.source_url }}</td>
-                <td>{{ source.source_user }}</td>
-                <td>{{ source.source_filter }}</td>
-                <td>
-                    <a href="/sources/{{ source.source_name }}/test"><span class="glyphicon glyphicon-ok"></span></a>
-                    <a href="/sources/{{ source.source_name }}"><span class="glyphicon glyphicon-edit"></span></a>
-                    <a href="/sources/{{ source.source_name }}/delete"><span class="glyphicon glyphicon-remove"></span></a>
-                </td>
-            </tr>
-    {% endfor %}
+        {% for source in sources %}
+            {% if source.source_status == 2 %}
+                <tr class="danger">
+                    <td><span class="glyphicon glyphicon-remove-sign"></span></td>
+            {% elif source.source_status == 1 %}
+                <tr class="success">
+                    <td><span class="glyphicon glyphicon-ok-sign"></span></td>
+            {% else %}
+                <tr>
+                    <td><span class="glyphicon glyphicon-question-sign"></span></td>
+            {% endif %}
+                    <td>{{ source.source_name }}</td>
+                    <td>{{ source.source_url }}</td>
+                    <td>{{ source.source_user }}</td>
+                    <td>{{ source.source_filter }}</td>
+                    <td>
+                        <a href="/sources/{{ source.source_name }}/test"><span class="glyphicon glyphicon-ok"></span></a>
+                        <a href="/sources/{{ source.source_name }}"><span class="glyphicon glyphicon-edit"></span></a>
+                        <a href="/sources/{{ source.source_name }}/delete"><span class="glyphicon glyphicon-remove"></span></a>
+                    </td>
+                </tr>
+        {% endfor %}
 
-</table>
+    </table>
+</div>
 
 {% include 'include/footer.html.tpl' %}
