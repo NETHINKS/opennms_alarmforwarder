@@ -6,7 +6,7 @@ Michael Batz <Michael.Batz@nethinks.com>
 :source-highlighter: pygments
 
 == Introduction
-OpenNMS AlarmForwarder is a small tool written in Python for doing notifications on OpenNMS alarms. In a configurable interval, alarms where read from one or multiple OpenNMS servers (using the OpenNMS REST API) and saved in a local database. You can define multiple targets for notifications (e.g. mail, SMS, OTRS ticket) and forwarding rules. The forwarding of alarms can be delayed and suppressed, if the alarm is resolved within this interval. A daemon handles the alarm forwarding and most of the configuration is done in a small WebUI (with REST API).
+OpenNMS AlarmForwarder is a small tool written in Python for doing notifications on OpenNMS alarms. In a configurable interval, alarms were read from one or multiple OpenNMS servers (using the OpenNMS REST API) and saved in a local database. You can define multiple targets for notifications (e.g. mail, SMS, OTRS ticket) and forwarding rules. The forwarding of alarms can be delayed and suppressed, if the alarm is resolved within this interval. A daemon handles the alarm forwarding and most of the configuration is done in a small WebUI (with REST API).
 
 == Setup
 
@@ -129,6 +129,220 @@ By default, the logs are written to files in the _logs_ subdirectory. Only warni
 
 
 == Using AlarmForwarder
+In the AlarmForwarder WebUI, you can configure Sources, Targets and Forwarding Rules.
+
+=== Sources
+A Source is an OpenNMS server. The communication to OpenNMS is done using the OpenNMS REST API. You add a new Source in the WebUI by configuring the following parameters:
+
+*Name*::
+  Name of the source. There should be no spaces or special characters in the name.
+
+*URL*::
+  URL of the OpenNMS REST API, e.g. _http://demo.opennms.org/opennms/rest_
+
+*Username*::
+  Username of an OpenNMS user, e.g. _demo_
+
+*Password*::
+  Password of the OpenNMS user, e.g. _demo_
+
+*Filter*::
+  Query filter for getting alarms. You can use all query filters that were described in the OpenNMS Development Guide for the REST Endpoint _/alarms_. If you leave this field empty, no filtering is done.
+
+=== Targets
+Alarms were forwarded to targets. Targets can also be configured in the AlarmForwarder WebUI. Each target has a unique Name, a Forwarding Class and a delay. The Forwarding Class defines the way, how alarms were forwarded. You can find a description of each available class in the following secitions. For each Forwarding Class, specific parameters can be set. The delay (in seconds) describes, how long the forwarding of the alarm will be delayed. If an alarm is resolved during that time, it will not be forwarded.
+
+For some parameters of the targets, the following variables can be used:
+
+|===
+|variable |description
+
+|%alarm_uei%
+|UEI of the alarm
+
+|%alarm_logmsg%
+|Logmessage of the alarm
+
+|%alarm_timestamp%
+|Timestamp of the first event of the alarm
+
+|%alarm_serverity%
+|Severity of the alarm
+
+|%alarm_node_label%
+|Nodelabel of the alarm
+
+|%alarm_node_interface%
+|Interface of the alarm
+
+|%alarm_description%
+|Description of the alarm
+
+|%alarm_operinstruct%
+|Operator instructions
+
+|%alarm_id%
+|ID of the alarm
+
+|%alarm_source%
+|Name of the OpenNMS Source
+
+|%parm_<parmname>%
+|Value of the parameter <parmname>. e.g. parm_cmdbid
+|===
+
+==== StdoutForwarder
+This is more for debugging and prints out alarms on standart output. The following parameters can be set:
+
+*AlertMessage*::
+  Format of the message of a new alarm. Variables can be used.
+
+*ResolvedMessage*::
+  Format of the message, if an alarm is resolved. Variables can be used.
+
+==== EmailForwarder
+This Forwarding Class forwards alarms via e-mail. The following parameters can be set:
+
+*smtpServer*::
+  SMTP server for sending mails.
+
+*smtpAuth*::
+  This could be "true" or "false" and defines, if a SMTP authentication needs to be done.
+
+*smtpUser*::
+  Username for SMTP authentication.
+
+*smtpPassword*::
+  Password for SMTP authentication.
+
+*fromAddress*::
+  Sender address.
+
+*target*::
+  Target address.
+
+*subjectFormatAlarm*::
+  Template of the mail subject for the alarm message. Variables can be used here.
+
+*subjectFormatResolved*::
+  Template of the mail subject for the resolved message. Variables can be used here.
+
+*messageFormatAlarm*::
+  Template of the alarm message. Variables can be used here.
+
+*messageFormatResolved*::
+  Template of the resolved  message. Variables can be used here.
+
+
+==== OtrsTicketForwarder
+This Forwarding Class creates ticket in the ticket system OTRS. Also, tickets can be closed if an alarm is resolved. If you want to use this forwarder, a Webservice needs to be created in OTRS. A configuration for OTRS can be found in the _contrib/otrs-configuration_ directory. The following parameters can be set for this forwarder:
+
+*otrsRestUrl*::
+  URL for the REST webservice, that was created in OTRS.
+
+*otrsRestUser*::
+  Username of a user that has the rights to create and update tickets.
+
+*otrsRestPassword*::
+  Password of the user.
+
+*otrsQueue*::
+  Queue, where tickets are created.
+
+*otrsCustomerMail*::
+  Mail address of the customer that should be used.
+
+*additionalFields*::
+  Here you can set the content of dynamic fields in the ticket. The format is _field1=value1;field2=value2_. Variables can be used here.
+
+*subjectFormatAlarm*::
+  Template of the ticket subject. Variables can be used here.
+
+*messageFormatAlarm*::
+  Template of the ticket content. Variables can be used here.
+
+*messageFormatResolved*::
+  Template of the resolved message, that will be written in the ticket, if the alarm is resolved. Variables can be used here.
+
+*closeTickets*::
+  This option can be set to "true", if tickets of resolved alarms should be closed automatically.
+
+
+==== SmsEagleForwarder
+This fowarder sends SMS using a SMSEagle appliance. The following parameters can be set:
+
+*url*::
+  Base URL of the SMSEagle API.
+
+*user*::
+  Username of the SMSEagle API.
+
+*password*::
+  Password of the SMSEagle API.
+
+*target*::
+  Target phone number.
+
+*messageFormatAlarm*::
+  Template of the SMS for forwarding alarms. Variables can be used here.
+
+*messageFormatResolved*::
+  Template of the SMS for the resolved message. Variables can be used here.
+
+
+=== Forwarding Rules
+A Forwarding Rule describes, which alarms should be forwarded to which targets. Each Forwarding Rule consists of a rule and a configured target. A rule has the following structure:
+
+[source]
+----
+Basic structure
+structure: variable1=value1;variable2=value2
+example: alarm_uei=uei.opennms.org/nodes/nodeDown
+
+operators:
+= means exact match
+~ means regex match
+example: alarm_uei~.*nodeDown.*
+----
+
+The following variables can be used:
+|===
+|variable |description
+
+|alarm_uei
+|UEI of the alarm
+
+|alarm_logmsg
+|Logmessage of the alarm
+
+|alarm_timestamp
+|Timestamp of the first event of the alarm
+
+|alarm_serverity
+|Severity of the alarm
+
+|alarm_node_label
+|Nodelabel of the alarm
+
+|alarm_node_interface
+|Interface of the alarm
+
+|alarm_description
+|Description of the alarm
+
+|alarm_operinstruct
+|Operator instructions
+
+|alarm_id
+|ID of the alarm
+
+|alarm_source
+|Name of the OpenNMS Source
+|===
+
+
+
+== REST API
 
 
 == Support

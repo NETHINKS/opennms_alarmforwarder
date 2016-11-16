@@ -445,7 +445,14 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_logging_configuration_em_logging_conf_em">Logging configuration (<em>logging.conf</em>)</a></li>
 </ul>
 </li>
-<li><a href="#_using_alarmforwarder">Using AlarmForwarder</a></li>
+<li><a href="#_using_alarmforwarder">Using AlarmForwarder</a>
+<ul class="sectlevel2">
+<li><a href="#_sources">Sources</a></li>
+<li><a href="#_targets">Targets</a></li>
+<li><a href="#_forwarding_rules">Forwarding Rules</a></li>
+</ul>
+</li>
+<li><a href="#_rest_api">REST API</a></li>
 <li><a href="#_support">Support</a></li>
 </ul>
 </div>
@@ -455,7 +462,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <h2 id="_introduction">Introduction</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>OpenNMS AlarmForwarder is a small tool written in Python for doing notifications on OpenNMS alarms. In a configurable interval, alarms where read from one or multiple OpenNMS servers (using the OpenNMS REST API) and saved in a local database. You can define multiple targets for notifications (e.g. mail, SMS, OTRS ticket) and forwarding rules. The forwarding of alarms can be delayed and suppressed, if the alarm is resolved within this interval. A daemon handles the alarm forwarding and most of the configuration is done in a small WebUI (with REST API).</p>
+<p>OpenNMS AlarmForwarder is a small tool written in Python for doing notifications on OpenNMS alarms. In a configurable interval, alarms were read from one or multiple OpenNMS servers (using the OpenNMS REST API) and saved in a local database. You can define multiple targets for notifications (e.g. mail, SMS, OTRS ticket) and forwarding rules. The forwarding of alarms can be delayed and suppressed, if the alarm is resolved within this interval. A daemon handles the alarm forwarding and most of the configuration is done in a small WebUI (with REST API).</p>
 </div>
 </div>
 </div>
@@ -662,6 +669,338 @@ searchfilter = (uid=%%username%%)</code></pre>
 <div class="sect1">
 <h2 id="_using_alarmforwarder">Using AlarmForwarder</h2>
 <div class="sectionbody">
+<div class="paragraph">
+<p>In the AlarmForwarder WebUI, you can configure Sources, Targets and Forwarding Rules.</p>
+</div>
+<div class="sect2">
+<h3 id="_sources">Sources</h3>
+<div class="paragraph">
+<p>A Source is an OpenNMS server. The communication to OpenNMS is done using the OpenNMS REST API. You add a new Source in the WebUI by configuring the following parameters:</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><strong>Name</strong></dt>
+<dd>
+<p>Name of the source. There should be no spaces or special characters in the name.</p>
+</dd>
+<dt class="hdlist1"><strong>URL</strong></dt>
+<dd>
+<p>URL of the OpenNMS REST API, e.g. <em><a href="http://demo.opennms.org/opennms/rest" class="bare">http://demo.opennms.org/opennms/rest</a></em></p>
+</dd>
+<dt class="hdlist1"><strong>Username</strong></dt>
+<dd>
+<p>Username of an OpenNMS user, e.g. <em>demo</em></p>
+</dd>
+<dt class="hdlist1"><strong>Password</strong></dt>
+<dd>
+<p>Password of the OpenNMS user, e.g. <em>demo</em></p>
+</dd>
+<dt class="hdlist1"><strong>Filter</strong></dt>
+<dd>
+<p>Query filter for getting alarms. You can use all query filters that were described in the OpenNMS Development Guide for the REST Endpoint <em>/alarms</em>. If you leave this field empty, no filtering is done.</p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_targets">Targets</h3>
+<div class="paragraph">
+<p>Alarms were forwarded to targets. Targets can also be configured in the AlarmForwarder WebUI. Each target has a unique Name, a Forwarding Class and a delay. The Forwarding Class defines the way, how alarms were forwarded. You can find a description of each available class in the following secitions. For each Forwarding Class, specific parameters can be set. The delay (in seconds) describes, how long the forwarding of the alarm will be delayed. If an alarm is resolved during that time, it will not be forwarded.</p>
+</div>
+<div class="paragraph">
+<p>For some parameters of the targets, the following variables can be used:</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">variable</th>
+<th class="tableblock halign-left valign-top">description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">%alarm_uei%</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">UEI of the alarm</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">%alarm_logmsg%</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Logmessage of the alarm</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">%alarm_timestamp%</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Timestamp of the first event of the alarm</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">%alarm_serverity%</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Severity of the alarm</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">%alarm_node_label%</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Nodelabel of the alarm</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">%alarm_node_interface%</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Interface of the alarm</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">%alarm_description%</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Description of the alarm</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">%alarm_operinstruct%</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Operator instructions</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">%alarm_id%</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ID of the alarm</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">%alarm_source%</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Name of the OpenNMS Source</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">%parm_&lt;parmname&gt;%</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Value of the parameter &lt;parmname&gt;. e.g. parm_cmdbid</p></td>
+</tr>
+</tbody>
+</table>
+<div class="sect3">
+<h4 id="_stdoutforwarder">StdoutForwarder</h4>
+<div class="paragraph">
+<p>This is more for debugging and prints out alarms on standart output. The following parameters can be set:</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><strong>AlertMessage</strong></dt>
+<dd>
+<p>Format of the message of a new alarm. Variables can be used.</p>
+</dd>
+<dt class="hdlist1"><strong>ResolvedMessage</strong></dt>
+<dd>
+<p>Format of the message, if an alarm is resolved. Variables can be used.</p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_emailforwarder">EmailForwarder</h4>
+<div class="paragraph">
+<p>This Forwarding Class forwards alarms via e-mail. The following parameters can be set:</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><strong>smtpServer</strong></dt>
+<dd>
+<p>SMTP server for sending mails.</p>
+</dd>
+<dt class="hdlist1"><strong>smtpAuth</strong></dt>
+<dd>
+<p>This could be "true" or "false" and defines, if a SMTP authentication needs to be done.</p>
+</dd>
+<dt class="hdlist1"><strong>smtpUser</strong></dt>
+<dd>
+<p>Username for SMTP authentication.</p>
+</dd>
+<dt class="hdlist1"><strong>smtpPassword</strong></dt>
+<dd>
+<p>Password for SMTP authentication.</p>
+</dd>
+<dt class="hdlist1"><strong>fromAddress</strong></dt>
+<dd>
+<p>Sender address.</p>
+</dd>
+<dt class="hdlist1"><strong>target</strong></dt>
+<dd>
+<p>Target address.</p>
+</dd>
+<dt class="hdlist1"><strong>subjectFormatAlarm</strong></dt>
+<dd>
+<p>Template of the mail subject for the alarm message. Variables can be used here.</p>
+</dd>
+<dt class="hdlist1"><strong>subjectFormatResolved</strong></dt>
+<dd>
+<p>Template of the mail subject for the resolved message. Variables can be used here.</p>
+</dd>
+<dt class="hdlist1"><strong>messageFormatAlarm</strong></dt>
+<dd>
+<p>Template of the alarm message. Variables can be used here.</p>
+</dd>
+<dt class="hdlist1"><strong>messageFormatResolved</strong></dt>
+<dd>
+<p>Template of the resolved  message. Variables can be used here.</p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_otrsticketforwarder">OtrsTicketForwarder</h4>
+<div class="paragraph">
+<p>This Forwarding Class creates ticket in the ticket system OTRS. Also, tickets can be closed if an alarm is resolved. If you want to use this forwarder, a Webservice needs to be created in OTRS. A configuration for OTRS can be found in the <em>contrib/otrs-configuration</em> directory. The following parameters can be set for this forwarder:</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><strong>otrsRestUrl</strong></dt>
+<dd>
+<p>URL for the REST webservice, that was created in OTRS.</p>
+</dd>
+<dt class="hdlist1"><strong>otrsRestUser</strong></dt>
+<dd>
+<p>Username of a user that has the rights to create and update tickets.</p>
+</dd>
+<dt class="hdlist1"><strong>otrsRestPassword</strong></dt>
+<dd>
+<p>Password of the user.</p>
+</dd>
+<dt class="hdlist1"><strong>otrsQueue</strong></dt>
+<dd>
+<p>Queue, where tickets are created.</p>
+</dd>
+<dt class="hdlist1"><strong>otrsCustomerMail</strong></dt>
+<dd>
+<p>Mail address of the customer that should be used.</p>
+</dd>
+<dt class="hdlist1"><strong>additionalFields</strong></dt>
+<dd>
+<p>Here you can set the content of dynamic fields in the ticket. The format is <em>field1=value1;field2=value2</em>. Variables can be used here.</p>
+</dd>
+<dt class="hdlist1"><strong>subjectFormatAlarm</strong></dt>
+<dd>
+<p>Template of the ticket subject. Variables can be used here.</p>
+</dd>
+<dt class="hdlist1"><strong>messageFormatAlarm</strong></dt>
+<dd>
+<p>Template of the ticket content. Variables can be used here.</p>
+</dd>
+<dt class="hdlist1"><strong>messageFormatResolved</strong></dt>
+<dd>
+<p>Template of the resolved message, that will be written in the ticket, if the alarm is resolved. Variables can be used here.</p>
+</dd>
+<dt class="hdlist1"><strong>closeTickets</strong></dt>
+<dd>
+<p>This option can be set to "true", if tickets of resolved alarms should be closed automatically.</p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_smseagleforwarder">SmsEagleForwarder</h4>
+<div class="paragraph">
+<p>This fowarder sends SMS using a SMSEagle appliance. The following parameters can be set:</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><strong>url</strong></dt>
+<dd>
+<p>Base URL of the SMSEagle API.</p>
+</dd>
+<dt class="hdlist1"><strong>user</strong></dt>
+<dd>
+<p>Username of the SMSEagle API.</p>
+</dd>
+<dt class="hdlist1"><strong>password</strong></dt>
+<dd>
+<p>Password of the SMSEagle API.</p>
+</dd>
+<dt class="hdlist1"><strong>target</strong></dt>
+<dd>
+<p>Target phone number.</p>
+</dd>
+<dt class="hdlist1"><strong>messageFormatAlarm</strong></dt>
+<dd>
+<p>Template of the SMS for forwarding alarms. Variables can be used here.</p>
+</dd>
+<dt class="hdlist1"><strong>messageFormatResolved</strong></dt>
+<dd>
+<p>Template of the SMS for the resolved message. Variables can be used here.</p>
+</dd>
+</dl>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_forwarding_rules">Forwarding Rules</h3>
+<div class="paragraph">
+<p>A Forwarding Rule describes, which alarms should be forwarded to which targets. Each Forwarding Rule consists of a rule and a configured target. A rule has the following structure:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight"><code>Basic structure
+structure: variable1=value1;variable2=value2
+example: alarm_uei=uei.opennms.org/nodes/nodeDown
+
+operators:
+= means exact match
+~ means regex match
+example: alarm_uei~.*nodeDown.*</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The following variables can be used:</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">variable</th>
+<th class="tableblock halign-left valign-top">description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">alarm_uei</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">UEI of the alarm</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">alarm_logmsg</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Logmessage of the alarm</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">alarm_timestamp</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Timestamp of the first event of the alarm</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">alarm_serverity</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Severity of the alarm</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">alarm_node_label</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Nodelabel of the alarm</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">alarm_node_interface</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Interface of the alarm</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">alarm_description</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Description of the alarm</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">alarm_operinstruct</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Operator instructions</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">alarm_id</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ID of the alarm</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">alarm_source</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Name of the OpenNMS Source</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_rest_api">REST API</h2>
+<div class="sectionbody">
 
 </div>
 </div>
@@ -676,7 +1015,7 @@ searchfilter = (uid=%%username%%)</code></pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-11-15 18:16:01 CET
+Last updated 2016-11-16 14:07:13 CET
 </div>
 </div>
 </body>
