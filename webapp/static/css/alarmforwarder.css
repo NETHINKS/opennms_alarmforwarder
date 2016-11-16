@@ -61,6 +61,7 @@ h1 span.glyphicon
 {
     margin-top:         50px;
     border-color:       #000000;
+    background:         rgba(255,255,255,0.8);
 }
 
 #custom-loginpanel .panel-heading
