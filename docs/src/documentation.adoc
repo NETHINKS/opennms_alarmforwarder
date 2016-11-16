@@ -343,6 +343,94 @@ The following variables can be used:
 
 
 == REST API
+AlarmForwarder has a REST API to access Sources, Targets and Forwarding Rules. Base URL by default is _http://<hostname>:5000_. A HTTP basic authentication with a valid AlarmForwarder user needs to be done. The data format is JSON. A lot of simple example scripts for the REST API can be found in the _/contrib_ directory.
+
+=== /sources
+
+|===
+|operation |resource |description
+
+|GET
+|/sources
+|list all configured sources
+
+|GET
+|/sources/<name>
+|get source with name <name>
+
+|GET
+|/sources/<name>/test
+|test, if source <name> works
+
+|GET
+|/sources/<name>/delete
+|delete source <name>
+
+|POST
+|/sources/add
+|adds a new source
+
+|POST
+|/sources/<name>/edit
+|edits source <name>
+|===
+
+
+=== /targets
+
+|===
+|operation |resource |description
+
+|GET
+|/targets
+|list all configured targets
+
+|GET
+|/targets/<name>
+|get target with name <name>
+
+|GET
+|/targets/<name>/test
+|send test message to target <name>
+
+|GET
+|/targets/<name>/delete
+|delete target <name>
+
+|POST
+|/targets/add
+|adds a new target
+
+|POST
+|/targets/<name>/edit
+|edits target <name>
+|===
+
+=== /rules
+
+|===
+|operation |resource |description
+
+|GET
+|/rules
+|list all configured forwarding rules
+
+|GET
+|/rules/<rule_id>
+|get forwarding rule with id <rule_id>
+
+|GET
+|/rules/<rule_id>/delete
+|delete forwarding rule <rule_id>
+
+|POST
+|/rules/add
+|adds a new forwarding rule
+
+|POST
+|/rules/<rule_id>/edit
+|edits forwarding rule <rule_id>
+|===
 
 
 == Support

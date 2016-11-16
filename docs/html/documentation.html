@@ -452,7 +452,13 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_forwarding_rules">Forwarding Rules</a></li>
 </ul>
 </li>
-<li><a href="#_rest_api">REST API</a></li>
+<li><a href="#_rest_api">REST API</a>
+<ul class="sectlevel2">
+<li><a href="#__sources">/sources</a></li>
+<li><a href="#__targets">/targets</a></li>
+<li><a href="#__rules">/rules</a></li>
+</ul>
+</li>
 <li><a href="#_support">Support</a></li>
 </ul>
 </div>
@@ -1001,7 +1007,151 @@ example: alarm_uei~.*nodeDown.*</code></pre>
 <div class="sect1">
 <h2 id="_rest_api">REST API</h2>
 <div class="sectionbody">
-
+<div class="paragraph">
+<p>AlarmForwarder has a REST API to access Sources, Targets and Forwarding Rules. Base URL by default is <em><a href="http://&lt;hostname&gt;:5000" class="bare">http://&lt;hostname&gt;:5000</a></em>. A HTTP basic authentication with a valid AlarmForwarder user needs to be done. The data format is JSON. A lot of simple example scripts for the REST API can be found in the <em>/contrib</em> directory.</p>
+</div>
+<div class="sect2">
+<h3 id="__sources">/sources</h3>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">operation</th>
+<th class="tableblock halign-left valign-top">resource</th>
+<th class="tableblock halign-left valign-top">description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">GET</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">/sources</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">list all configured sources</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">GET</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">/sources/&lt;name&gt;</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">get source with name &lt;name&gt;</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">GET</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">/sources/&lt;name&gt;/test</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">test, if source &lt;name&gt; works</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">GET</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">/sources/&lt;name&gt;/delete</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">delete source &lt;name&gt;</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">POST</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">/sources/add</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">adds a new source</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">POST</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">/sources/&lt;name&gt;/edit</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">edits source &lt;name&gt;</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="__targets">/targets</h3>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">operation</th>
+<th class="tableblock halign-left valign-top">resource</th>
+<th class="tableblock halign-left valign-top">description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">GET</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">/targets</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">list all configured targets</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">GET</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">/targets/&lt;name&gt;</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">get target with name &lt;name&gt;</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">GET</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">/targets/&lt;name&gt;/test</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">send test message to target &lt;name&gt;</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">GET</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">/targets/&lt;name&gt;/delete</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">delete target &lt;name&gt;</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">POST</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">/targets/add</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">adds a new target</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">POST</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">/targets/&lt;name&gt;/edit</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">edits target &lt;name&gt;</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="__rules">/rules</h3>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">operation</th>
+<th class="tableblock halign-left valign-top">resource</th>
+<th class="tableblock halign-left valign-top">description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">GET</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">/rules</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">list all configured forwarding rules</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">GET</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">/rules/&lt;rule_id&gt;</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">get forwarding rule with id &lt;rule_id&gt;</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">GET</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">/rules/&lt;rule_id&gt;/delete</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">delete forwarding rule &lt;rule_id&gt;</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">POST</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">/rules/add</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">adds a new forwarding rule</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">POST</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">/rules/&lt;rule_id&gt;/edit</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">edits forwarding rule &lt;rule_id&gt;</p></td>
+</tr>
+</tbody>
+</table>
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -1015,7 +1165,7 @@ example: alarm_uei~.*nodeDown.*</code></pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-11-16 14:07:13 CET
+Last updated 2016-11-16 14:52:53 CET
 </div>
 </div>
 </body>
