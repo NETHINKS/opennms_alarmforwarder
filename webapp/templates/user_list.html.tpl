@@ -2,10 +2,9 @@
 
 <!-- page navigation -->
 <ul class="nav nav-pills">
-    <li role="presentation">
-        <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#modalAddUser">
-            Add new User...
-        </button>
+    <li role="presentation"><a href="#" data-toggle="modal" data-target="#modalAddUser">
+                                <span class="glyphicon glyphicon-plus"></span>Add User
+                            </a>
     </li>
 </ul>
 
@@ -31,7 +30,7 @@
                         <label for="inputPassword">Password</label>
                         <input type="password" class="form-control" id="inputPassword" name="password" placeholder="secret1234">
                     </div>
-                    <button type="submit" class="btn btn-default">Submit</button>
+                    <button type="submit" class="btn btn-primary">Submit</button>
                 </form>
             </div>
         </div>

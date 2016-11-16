@@ -435,10 +435,11 @@ def edit_target(name):
 def get_rule_list():
     orm_session = model.Session()
     rules = orm_session.query(model.ForwardingRule).all()
+    targets = orm_session.query(model.Target).all()
     orm_session.close()
     if json_check():
         return jsonify(items=[rule.dict_repr() for rule in rules])
-    return render_template("rule_list.html.tpl", rules=rules)
+    return render_template("rule_list.html.tpl", rules=rules,  targets=targets)
 
 @app.route("/rules/<rule_id>")
 @AuthenticationHandler.login_required
@@ -458,32 +459,26 @@ def get_rule(rule_id):
         return jsonify(rule.dict_repr())
     return render_template("rule_view.html.tpl", rule=rule, targets=targets)
 
-@app.route("/rules/add", methods=['GET', 'POST'])
+@app.route("/rules/add", methods=['POST'])
 @AuthenticationHandler.login_required
 def add_rule():
-    if request.method == 'GET':
-        orm_session = model.Session()
-        targets = orm_session.query(model.Target).all()
-        orm_session.close()
-        return render_template("rule_add.html.tpl", targets=targets)
+    # check, if data are form data or json
+    if request.get_json(silent=True) is not None:
+        rule_match = request.json["rule_match"]
+        rule_target = request.json["rule_target"]
     else:
-        # check, if data are form data or json
-        if request.get_json(silent=True) is not None:
-            rule_match = request.json["rule_match"]
-            rule_target = request.json["rule_target"]
-        else:
-            rule_match = request.form['rule']
-            rule_target = request.form['target']
-        orm_session = model.Session()
-        rule = model.ForwardingRule(rule_match=rule_match, rule_target=rule_target)
-        orm_session.add(rule)
-        orm_session.commit()
-        orm_session.close()
-        result_msg = "Rule successfully added"
-        if json_check():
-            return json_result(result_msg, 200)
-        flash("Rule successfully added", "alert-success")
-        return redirect("/rules")
+        rule_match = request.form['rule']
+        rule_target = request.form['target']
+    orm_session = model.Session()
+    rule = model.ForwardingRule(rule_match=rule_match, rule_target=rule_target)
+    orm_session.add(rule)
+    orm_session.commit()
+    orm_session.close()
+    result_msg = "Rule successfully added"
+    if json_check():
+        return json_result(result_msg, 200)
+    flash("Rule successfully added", "alert-success")
+    return redirect("/rules")
 
 @app.route("/rules/<rule_id>/edit", methods=['POST'])
 @AuthenticationHandler.login_required

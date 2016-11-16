@@ -28,7 +28,7 @@
                             </div>
                             <!-- login form: login button -->
                             <div class="form-group">
-                                <button type="submit" class="btn btn-default col-xs-offset-1">Login</button>
+                                <button type="submit" class="btn btn-primary col-xs-offset-1">Login</button>
                             </div>
                         </form>
                     </div>

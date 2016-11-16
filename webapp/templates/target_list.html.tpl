@@ -2,10 +2,9 @@
 
 <!-- page navigation -->
 <ul class="nav nav-pills">
-    <li role="presentation">
-        <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#modalAddTarget">
-            Add new Target...
-        </button>
+    <li role="presentation"><a href="#" data-toggle="modal" data-target="#modalAddTarget">
+                                <span class="glyphicon glyphicon-plus"></span>Add Target
+                            </a>
     </li>
 </ul>
 
@@ -40,7 +39,7 @@
                         <label for="inputDelay">Target Delay [sec]</label>
                         <input type="number" class="form-control" id="inputDelay" name="delay" value="0" placeholder="Delay">
                     </div>
-                    <button type="submit" class="btn btn-default">Submit</button>
+                    <button type="submit" class="btn btn-primary">Submit</button>
                 </form>
             </div>
         </div>

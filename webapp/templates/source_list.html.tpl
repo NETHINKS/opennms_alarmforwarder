@@ -2,15 +2,13 @@
 
 <!-- page navigation -->
 <ul class="nav nav-pills">
-    <li role="presentation">
-        <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#modalAddSource">
-            Add new Source...
-        </button>
+    <li role="presentation"><a href="#" data-toggle="modal" data-target="#modalAddSource">
+                                <span class="glyphicon glyphicon-plus"></span>Add Source
+                            </a>
     </li>
 </ul>
 
 
-<h1><span class="glyphicon glyphicon-log-in"></span>Sources</h1>
 
 <!-- modal: add new target -->
 <div class="modal fade" id="modalAddSource" role="dialog">
@@ -43,7 +41,7 @@
                         <label for="inputFilter">Filter</label>
                         <input type="text" class="form-control" id="inputFilter" name="filter" placeholder="alarmAckUser IS NULL AND stickyMemo is NULL">
                     </div>
-                    <button type="submit" class="btn btn-default">Submit</button>
+                    <button type="submit" class="btn btn-primary">Submit</button>
                 </form>
             </div>
         </div>
@@ -52,6 +50,7 @@
 
 
 <!-- table with all sources -->
+<h1><span class="glyphicon glyphicon-log-in"></span>Sources</h1>
 <table class="table table-default">
     <tr>
             <th>Status</th>
