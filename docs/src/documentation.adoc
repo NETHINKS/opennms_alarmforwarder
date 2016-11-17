@@ -36,6 +36,8 @@ Now you can start AlarmForwarder by executing _opennms_alarmforwarder.py_:
 
 You can now log into the WebUI by accessing the URL http://<Host>:5000 with username _admin_ and password _admin_.
 
+You can also find examples for a systemd service definition and a SystemV init script for Debian/Ubuntu in the contrib directory.
+
 
 === Start a Docker Container
 
