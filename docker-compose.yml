@@ -1,0 +1,20 @@
+version: "2"
+services:
+  alarmforwarder:
+    image: nethinks/alarmforwarder
+    build: ./
+    ports:
+      - "5000:5000"
+    depends_on:
+      - dbserver
+    environment:
+      INIT_DB_SERVER: "dbserver"
+      INIT_DB_NAME: "alarmforwarder"
+      INIT_DB_USER: "postgres"
+      INIT_DB_PW: "secret1234"
+
+  dbserver:
+    image: postgres
+    environment:
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "secret1234"
