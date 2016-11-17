@@ -34,11 +34,12 @@ def main():
 
     # run scheduler
     print("Starting opennms_alarmforwarder...")
-    signal.signal(signal.SIGTERM, process_helper.shutdown_handler)
     proc_webapp = Process(target=webapp.run)
     proc_scheduler = Process(target=scheduler.run)
     proc_webapp.start()
     proc_scheduler.start()
+    signal.signal(signal.SIGTERM, process_helper.shutdown_handler)
+    signal.signal(signal.SIGINT, process_helper.shutdown_handler)
 
     try:
         proc_scheduler.join()
