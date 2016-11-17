@@ -1,0 +1,11 @@
+[Unit]
+Description=alarmforwarder
+After=network.target
+
+[Service]
+ExecStart=/opt/opennms_alarmforwarder/opennms_alarmforwarder.py &
+KillMode=process
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

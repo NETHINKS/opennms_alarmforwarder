@@ -2,15 +2,18 @@
 """Main module
 """
 from multiprocessing import Process
+import signal
 import os
 import logging
 import logging.config
 import model
+import process_helper
 from receiver import OpennmsReceiver
 from scheduler import Scheduler
 from config import Config
 from gunicorn_integration import WebApplication
 from webapp.dispatcher import app as wsgi_app
+
 
 def main():
     # get directory name
@@ -31,6 +34,7 @@ def main():
 
     # run scheduler
     print("Starting opennms_alarmforwarder...")
+    signal.signal(signal.SIGTERM, process_helper.shutdown_handler)
     proc_webapp = Process(target=webapp.run)
     proc_scheduler = Process(target=scheduler.run)
     proc_webapp.start()
@@ -39,7 +43,7 @@ def main():
     try:
         proc_scheduler.join()
         proc_webapp.join()
-    except KeyboardInterrupt:
+    except:
         print("Stopping opennms_alarmforwarder...")
         proc_scheduler.terminate()
         proc_webapp.terminate()
