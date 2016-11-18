@@ -65,4 +65,4 @@ The documentation is provided with the tool and can also seen on [GitHub](https:
 
 
 ## Support
-If you have questions, found a bug or have an idea to enhance AlarmForwarder, please open an issue at the https://github.com/NETHINKS/opennms_alarmforwarder[GitHub project].
+If you have questions, found a bug or have an idea to enhance AlarmForwarder, please open an issue at the [GitHub project](https://github.com/NETHINKS/opennms_alarmforwarder).
