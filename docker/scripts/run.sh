@@ -5,14 +5,10 @@ if [ -z ${INIT_DB_SERVER+x} ]; then INIT_DB_SERVER="postgres"; fi
 if [ -z ${INIT_DB_NAME+x} ]; then INIT_DB_NAME="alarmforwarder"; fi
 if [ -z ${INIT_DB_USER+x} ]; then INIT_DB_USER="postgres"; fi
 if [ -z ${INIT_DB_PW+x} ]; then INIT_DB_PW="postgres"; fi
-if [ -z ${INIT_ADMIN_PW_NEW+x} ]; then INIT_ADMIN_PW_NEW="admin"; fi
-if [ -z ${INIT_ONMS_URL+x} ]; then INIT_ONMS_URL="http://opennms:8980/opennms/rest"; fi
-if [ -z ${INIT_ONMS_USER+x} ]; then INIT_ONMS_USER="admin"; fi
-if [ -z ${INIT_ONMS_PW+x} ]; then INIT_ONMS_PW="admin"; fi
 
 # define other variables
-ALARMFORWARDER_INITFLAG=/opt/initflag
 ALARMFORWARDER_DIR=/opt/opennms_alarmforwarder
+ALARMFORWARDER_INITFLAG=${ALARMFORWARDER_DIR}/logs/initflag
 
 # waiting for PostgreSQL startup
 sleep 10

@@ -527,7 +527,33 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </div>
 <div class="sect2">
 <h3 id="_start_a_docker_container">Start a Docker Container</h3>
+<div class="paragraph">
+<p>There is a Docker Image for AlarmForwarder on Docker Hub. It will need a PostgreSQL database. You can use the following docker-compse.yml file:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight"><code data-lang="yml">version: "2"
+services:
+  alarmforwarder:
+    image: nethinks/alarmforwarder
+    build: ./
+    ports:
+      - "5000:5000"
+    depends_on:
+      - dbserver
+    environment:
+      INIT_DB_SERVER: "dbserver"
+      INIT_DB_NAME: "alarmforwarder"
+      INIT_DB_USER: "postgres"
+      INIT_DB_PW: "secret1234"
 
+  dbserver:
+    image: postgres
+    environment:
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "secret1234"</code></pre>
+</div>
+</div>
 </div>
 </div>
 </div>
@@ -1168,7 +1194,7 @@ example: alarm_uei~.*nodeDown.*</code></pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-11-17 12:14:58 CET
+Last updated 2016-11-18 15:29:23 CET
 </div>
 </div>
 </body>

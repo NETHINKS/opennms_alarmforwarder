@@ -11,5 +11,8 @@ RUN apt-get update -y \
                           postgresql-client \
     && chmod +x /opt/opennms_alarmforwarder/docker/scripts/run.sh 
 
+# volumes for logs
+VOLUME /opt/opennms_alarmforwarder/logs
+
 # start alarmforwarder
 CMD /opt/opennms_alarmforwarder/docker/scripts/run.sh

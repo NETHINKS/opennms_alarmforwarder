@@ -40,7 +40,31 @@ You can also find examples for a systemd service definition and a SystemV init s
 
 
 === Start a Docker Container
+There is a Docker Image for AlarmForwarder on Docker Hub. It will need a PostgreSQL database. You can use the following docker-compse.yml file:
 
+[source, yml]
+----
+version: "2"
+services:
+  alarmforwarder:
+    image: nethinks/alarmforwarder
+    build: ./
+    ports:
+      - "5000:5000"
+    depends_on:
+      - dbserver
+    environment:
+      INIT_DB_SERVER: "dbserver"
+      INIT_DB_NAME: "alarmforwarder"
+      INIT_DB_USER: "postgres"
+      INIT_DB_PW: "secret1234"
+
+  dbserver:
+    image: postgres
+    environment:
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "secret1234"
+----
 
 == Configuration of the AlarmForwarder application
 The general behavior of the application is stored in configuration files in the _etc_ subdirectory. OpenNMS sources, targets for alarm forwarding and rules were configured in the WebUI. Please see the "Using AlarmForwarder" section. The following configuration files are available:
