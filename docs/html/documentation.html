@@ -419,7 +419,71 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.5.0/css/font-awesome.min.css">
 <style>
-/* Pygments styles disabled. Pygments is not available. */
+.listingblock .pygments .hll { background-color: #ffffcc }
+.listingblock .pygments  { background: #f8f8f8; }
+.listingblock .pygments .tok-c { color: #408080; font-style: italic } /* Comment */
+.listingblock .pygments .tok-err { border: 1px solid #FF0000 } /* Error */
+.listingblock .pygments .tok-k { color: #008000; font-weight: bold } /* Keyword */
+.listingblock .pygments .tok-o { color: #666666 } /* Operator */
+.listingblock .pygments .tok-ch { color: #408080; font-style: italic } /* Comment.Hashbang */
+.listingblock .pygments .tok-cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.listingblock .pygments .tok-cp { color: #BC7A00 } /* Comment.Preproc */
+.listingblock .pygments .tok-cpf { color: #408080; font-style: italic } /* Comment.PreprocFile */
+.listingblock .pygments .tok-c1 { color: #408080; font-style: italic } /* Comment.Single */
+.listingblock .pygments .tok-cs { color: #408080; font-style: italic } /* Comment.Special */
+.listingblock .pygments .tok-gd { color: #A00000 } /* Generic.Deleted */
+.listingblock .pygments .tok-ge { font-style: italic } /* Generic.Emph */
+.listingblock .pygments .tok-gr { color: #FF0000 } /* Generic.Error */
+.listingblock .pygments .tok-gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.listingblock .pygments .tok-gi { color: #00A000 } /* Generic.Inserted */
+.listingblock .pygments .tok-go { color: #888888 } /* Generic.Output */
+.listingblock .pygments .tok-gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.listingblock .pygments .tok-gs { font-weight: bold } /* Generic.Strong */
+.listingblock .pygments .tok-gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.listingblock .pygments .tok-gt { color: #0044DD } /* Generic.Traceback */
+.listingblock .pygments .tok-kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.listingblock .pygments .tok-kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.listingblock .pygments .tok-kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.listingblock .pygments .tok-kp { color: #008000 } /* Keyword.Pseudo */
+.listingblock .pygments .tok-kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.listingblock .pygments .tok-kt { color: #B00040 } /* Keyword.Type */
+.listingblock .pygments .tok-m { color: #666666 } /* Literal.Number */
+.listingblock .pygments .tok-s { color: #BA2121 } /* Literal.String */
+.listingblock .pygments .tok-na { color: #7D9029 } /* Name.Attribute */
+.listingblock .pygments .tok-nb { color: #008000 } /* Name.Builtin */
+.listingblock .pygments .tok-nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.listingblock .pygments .tok-no { color: #880000 } /* Name.Constant */
+.listingblock .pygments .tok-nd { color: #AA22FF } /* Name.Decorator */
+.listingblock .pygments .tok-ni { color: #999999; font-weight: bold } /* Name.Entity */
+.listingblock .pygments .tok-ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.listingblock .pygments .tok-nf { color: #0000FF } /* Name.Function */
+.listingblock .pygments .tok-nl { color: #A0A000 } /* Name.Label */
+.listingblock .pygments .tok-nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.listingblock .pygments .tok-nt { color: #008000; font-weight: bold } /* Name.Tag */
+.listingblock .pygments .tok-nv { color: #19177C } /* Name.Variable */
+.listingblock .pygments .tok-ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.listingblock .pygments .tok-w { color: #bbbbbb } /* Text.Whitespace */
+.listingblock .pygments .tok-mb { color: #666666 } /* Literal.Number.Bin */
+.listingblock .pygments .tok-mf { color: #666666 } /* Literal.Number.Float */
+.listingblock .pygments .tok-mh { color: #666666 } /* Literal.Number.Hex */
+.listingblock .pygments .tok-mi { color: #666666 } /* Literal.Number.Integer */
+.listingblock .pygments .tok-mo { color: #666666 } /* Literal.Number.Oct */
+.listingblock .pygments .tok-sb { color: #BA2121 } /* Literal.String.Backtick */
+.listingblock .pygments .tok-sc { color: #BA2121 } /* Literal.String.Char */
+.listingblock .pygments .tok-sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.listingblock .pygments .tok-s2 { color: #BA2121 } /* Literal.String.Double */
+.listingblock .pygments .tok-se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.listingblock .pygments .tok-sh { color: #BA2121 } /* Literal.String.Heredoc */
+.listingblock .pygments .tok-si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.listingblock .pygments .tok-sx { color: #008000 } /* Literal.String.Other */
+.listingblock .pygments .tok-sr { color: #BB6688 } /* Literal.String.Regex */
+.listingblock .pygments .tok-s1 { color: #BA2121 } /* Literal.String.Single */
+.listingblock .pygments .tok-ss { color: #19177C } /* Literal.String.Symbol */
+.listingblock .pygments .tok-bp { color: #008000 } /* Name.Builtin.Pseudo */
+.listingblock .pygments .tok-vc { color: #19177C } /* Name.Variable.Class */
+.listingblock .pygments .tok-vg { color: #19177C } /* Name.Variable.Global */
+.listingblock .pygments .tok-vi { color: #19177C } /* Name.Variable.Instance */
+.listingblock .pygments .tok-il { color: #666666 } /* Literal.Number.Integer.Long */
 </style>
 </head>
 <body class="article toc2 toc-left">
@@ -532,26 +596,26 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="pygments highlight"><code data-lang="yml">version: "2"
-services:
-  alarmforwarder:
-    image: nethinks/alarmforwarder
-    build: ./
-    ports:
-      - "5000:5000"
-    depends_on:
-      - dbserver
-    environment:
-      INIT_DB_SERVER: "dbserver"
-      INIT_DB_NAME: "alarmforwarder"
-      INIT_DB_USER: "postgres"
-      INIT_DB_PW: "secret1234"
+<pre class="pygments highlight"><code data-lang="yml"><span class="tok-l tok-l-Scalar tok-l-Scalar-Plain">version</span><span class="tok-p tok-p-Indicator">:</span> <span class="tok-s">&quot;2&quot;</span>
+<span class="tok-l tok-l-Scalar tok-l-Scalar-Plain">services</span><span class="tok-p tok-p-Indicator">:</span>
+  <span class="tok-l tok-l-Scalar tok-l-Scalar-Plain">alarmforwarder</span><span class="tok-p tok-p-Indicator">:</span>
+    <span class="tok-l tok-l-Scalar tok-l-Scalar-Plain">image</span><span class="tok-p tok-p-Indicator">:</span> <span class="tok-l tok-l-Scalar tok-l-Scalar-Plain">nethinks/alarmforwarder</span>
+    <span class="tok-l tok-l-Scalar tok-l-Scalar-Plain">build</span><span class="tok-p tok-p-Indicator">:</span> <span class="tok-l tok-l-Scalar tok-l-Scalar-Plain">./</span>
+    <span class="tok-l tok-l-Scalar tok-l-Scalar-Plain">ports</span><span class="tok-p tok-p-Indicator">:</span>
+      <span class="tok-p tok-p-Indicator">-</span> <span class="tok-s">&quot;5000:5000&quot;</span>
+    <span class="tok-l tok-l-Scalar tok-l-Scalar-Plain">depends_on</span><span class="tok-p tok-p-Indicator">:</span>
+      <span class="tok-p tok-p-Indicator">-</span> <span class="tok-l tok-l-Scalar tok-l-Scalar-Plain">dbserver</span>
+    <span class="tok-l tok-l-Scalar tok-l-Scalar-Plain">environment</span><span class="tok-p tok-p-Indicator">:</span>
+      <span class="tok-l tok-l-Scalar tok-l-Scalar-Plain">INIT_DB_SERVER</span><span class="tok-p tok-p-Indicator">:</span> <span class="tok-s">&quot;dbserver&quot;</span>
+      <span class="tok-l tok-l-Scalar tok-l-Scalar-Plain">INIT_DB_NAME</span><span class="tok-p tok-p-Indicator">:</span> <span class="tok-s">&quot;alarmforwarder&quot;</span>
+      <span class="tok-l tok-l-Scalar tok-l-Scalar-Plain">INIT_DB_USER</span><span class="tok-p tok-p-Indicator">:</span> <span class="tok-s">&quot;postgres&quot;</span>
+      <span class="tok-l tok-l-Scalar tok-l-Scalar-Plain">INIT_DB_PW</span><span class="tok-p tok-p-Indicator">:</span> <span class="tok-s">&quot;secret1234&quot;</span>
 
-  dbserver:
-    image: postgres
-    environment:
-      POSTGRES_USER: "postgres"
-      POSTGRES_PASSWORD: "secret1234"</code></pre>
+  <span class="tok-l tok-l-Scalar tok-l-Scalar-Plain">dbserver</span><span class="tok-p tok-p-Indicator">:</span>
+    <span class="tok-l tok-l-Scalar tok-l-Scalar-Plain">image</span><span class="tok-p tok-p-Indicator">:</span> <span class="tok-l tok-l-Scalar tok-l-Scalar-Plain">postgres</span>
+    <span class="tok-l tok-l-Scalar tok-l-Scalar-Plain">environment</span><span class="tok-p tok-p-Indicator">:</span>
+      <span class="tok-l tok-l-Scalar tok-l-Scalar-Plain">POSTGRES_USER</span><span class="tok-p tok-p-Indicator">:</span> <span class="tok-s">&quot;postgres&quot;</span>
+      <span class="tok-l tok-l-Scalar tok-l-Scalar-Plain">POSTGRES_PASSWORD</span><span class="tok-p tok-p-Indicator">:</span> <span class="tok-s">&quot;secret1234&quot;</span></code></pre>
 </div>
 </div>
 </div>
@@ -581,25 +645,25 @@ services:
 <div class="listingblock">
 <div class="title">alarmforwarder.conf</div>
 <div class="content">
-<pre class="pygments highlight"><code data-lang="ini">[DatabaseConnection]
-url = postgresql://alarmforwarder:alarmforwarder@localhost/alarmforwarder
+<pre class="pygments highlight"><code data-lang="ini"><span class="tok-k">[DatabaseConnection]</span>
+<span class="tok-na">url</span> <span class="tok-o">=</span> <span class="tok-s">postgresql://alarmforwarder:alarmforwarder@localhost/alarmforwarder</span>
 
-[Webserver]
-bind = 0.0.0.0:5000
-workers = 2
+<span class="tok-k">[Webserver]</span>
+<span class="tok-na">bind</span> <span class="tok-o">=</span> <span class="tok-s">0.0.0.0:5000</span>
+<span class="tok-na">workers</span> <span class="tok-o">=</span> <span class="tok-s">2</span>
 
-[Scheduler]
-queryInterval = 30
+<span class="tok-k">[Scheduler]</span>
+<span class="tok-na">queryInterval</span> <span class="tok-o">=</span> <span class="tok-s">30</span>
 
-[Security]
-authenticationProvider = LocalUserAuthenticationProvider
+<span class="tok-k">[Security]</span>
+<span class="tok-na">authenticationProvider</span> <span class="tok-o">=</span> <span class="tok-s">LocalUserAuthenticationProvider</span>
 
-[LdapAuthentication]
-url = ldaps://localhost:636
-bindDn = cn=reader,dc=example,dc=com
-bindPassword = secret1234
-baseDn = dc=example,dc=com
-searchfilter = (uid=%%username%%)</code></pre>
+<span class="tok-k">[LdapAuthentication]</span>
+<span class="tok-na">url</span> <span class="tok-o">=</span> <span class="tok-s">ldaps://localhost:636</span>
+<span class="tok-na">bindDn</span> <span class="tok-o">=</span> <span class="tok-s">cn=reader,dc=example,dc=com</span>
+<span class="tok-na">bindPassword</span> <span class="tok-o">=</span> <span class="tok-s">secret1234</span>
+<span class="tok-na">baseDn</span> <span class="tok-o">=</span> <span class="tok-s">dc=example,dc=com</span>
+<span class="tok-na">searchfilter</span> <span class="tok-o">=</span> <span class="tok-s">(uid=%%username%%)</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -740,7 +804,7 @@ searchfilter = (uid=%%username%%)</code></pre>
 <div class="sect2">
 <h3 id="_targets">Targets</h3>
 <div class="paragraph">
-<p>Alarms were forwarded to targets. Targets can also be configured in the AlarmForwarder WebUI. Each target has a unique Name, a Forwarding Class and a delay. The Forwarding Class defines the way, how alarms were forwarded. You can find a description of each available class in the following secitions. For each Forwarding Class, specific parameters can be set. The delay (in seconds) describes, how long the forwarding of the alarm will be delayed. If an alarm is resolved during that time, it will not be forwarded.</p>
+<p>Alarms were forwarded to targets. Targets can also be configured in the AlarmForwarder WebUI. Each target has a unique Name and a Forwarding Class. The Forwarding Class defines the way, how alarms were forwarded. You can find a description of each available class in the following secitions. For each Forwarding Class, specific parameters can be set.</p>
 </div>
 <div class="paragraph">
 <p>For some parameters of the targets, the following variables can be used:</p>
@@ -817,6 +881,14 @@ searchfilter = (uid=%%username%%)</code></pre>
 <dt class="hdlist1"><strong>ResolvedMessage</strong></dt>
 <dd>
 <p>Format of the message, if an alarm is resolved. Variables can be used.</p>
+</dd>
+<dt class="hdlist1"><strong>DisabledForwardingMessage</strong></dt>
+<dd>
+<p>Message that is sent, if the maximum number of forwarded alarms is reached.</p>
+</dd>
+<dt class="hdlist1"><strong>EnabledForwardingMessage</strong></dt>
+<dd>
+<p>Message that is sent, if the maximum number of forwarded alarms was reached and is now rearmed.</p>
 </dd>
 </dl>
 </div>
@@ -952,6 +1024,14 @@ searchfilter = (uid=%%username%%)</code></pre>
 <dd>
 <p>Template of the SMS for the resolved message. Variables can be used here.</p>
 </dd>
+<dt class="hdlist1"><strong>messageDisabledForwarding</strong></dt>
+<dd>
+<p>Message that is sent, if the maximum number of forwarded alarms is reached.</p>
+</dd>
+<dt class="hdlist1"><strong>messageEnabledForwarding</strong></dt>
+<dd>
+<p>Message that is sent, if the maximum number of forwarded alarms was reached and is now rearmed.</p>
+</dd>
 </dl>
 </div>
 </div>
@@ -959,7 +1039,10 @@ searchfilter = (uid=%%username%%)</code></pre>
 <div class="sect2">
 <h3 id="_forwarding_rules">Forwarding Rules</h3>
 <div class="paragraph">
-<p>A Forwarding Rule describes, which alarms should be forwarded to which targets. Each Forwarding Rule consists of a rule and a configured target. A rule has the following structure:</p>
+<p>A Forwarding Rule describes, which alarms should be forwarded to which targets. Each Forwarding Rule consists of a rule, a configured target, a delay and a limit for the count of forwarded alarms. The delay (in seconds) describes, how long the forwarding of the alarm will be delayed. If an alarm is resolved during that time, it will not be forwarded. With the parameter "max forwarded active Alarms" it is possible to limit the amount of forwarded alarms. If the value is <em>0</em>, the feature is disabled. If it is set to a specific value, this is the maximum number of alarms, that were forwarded to the user. If this limit is reached or rearmed, a message will be sent to the user.</p>
+</div>
+<div class="paragraph">
+<p>A rule has the following structure:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -1194,7 +1277,7 @@ example: alarm_uei~.*nodeDown.*</code></pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-11-18 15:29:23 CET
+Last updated 2016-11-20 15:21:00 CET
 </div>
 </div>
 </body>

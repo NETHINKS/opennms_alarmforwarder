@@ -176,7 +176,7 @@ A Source is an OpenNMS server. The communication to OpenNMS is done using the Op
   Query filter for getting alarms. You can use all query filters that were described in the OpenNMS Development Guide for the REST Endpoint _/alarms_. If you leave this field empty, no filtering is done.
 
 === Targets
-Alarms were forwarded to targets. Targets can also be configured in the AlarmForwarder WebUI. Each target has a unique Name, a Forwarding Class and a delay. The Forwarding Class defines the way, how alarms were forwarded. You can find a description of each available class in the following secitions. For each Forwarding Class, specific parameters can be set. The delay (in seconds) describes, how long the forwarding of the alarm will be delayed. If an alarm is resolved during that time, it will not be forwarded.
+Alarms were forwarded to targets. Targets can also be configured in the AlarmForwarder WebUI. Each target has a unique Name and a Forwarding Class. The Forwarding Class defines the way, how alarms were forwarded. You can find a description of each available class in the following secitions. For each Forwarding Class, specific parameters can be set. 
 
 For some parameters of the targets, the following variables can be used:
 
@@ -225,6 +225,13 @@ This is more for debugging and prints out alarms on standart output. The followi
 
 *ResolvedMessage*::
   Format of the message, if an alarm is resolved. Variables can be used.
+
+*DisabledForwardingMessage*::
+  Message that is sent, if the maximum number of forwarded alarms is reached.
+
+*EnabledForwardingMessage*::
+  Message that is sent, if the maximum number of forwarded alarms was reached and is now rearmed.
+
 
 ==== EmailForwarder
 This Forwarding Class forwards alarms via e-mail. The following parameters can be set:
@@ -315,9 +322,18 @@ This fowarder sends SMS using a SMSEagle appliance. The following parameters can
 *messageFormatResolved*::
   Template of the SMS for the resolved message. Variables can be used here.
 
+*messageDisabledForwarding*::
+  Message that is sent, if the maximum number of forwarded alarms is reached.
+
+*messageEnabledForwarding*::
+  Message that is sent, if the maximum number of forwarded alarms was reached and is now rearmed.
+
+
 
 === Forwarding Rules
-A Forwarding Rule describes, which alarms should be forwarded to which targets. Each Forwarding Rule consists of a rule and a configured target. A rule has the following structure:
+A Forwarding Rule describes, which alarms should be forwarded to which targets. Each Forwarding Rule consists of a rule, a configured target, a delay and a limit for the count of forwarded alarms. The delay (in seconds) describes, how long the forwarding of the alarm will be delayed. If an alarm is resolved during that time, it will not be forwarded. With the parameter "max forwarded active Alarms" it is possible to limit the amount of forwarded alarms. If the value is _0_, the feature is disabled. If it is set to a specific value, this is the maximum number of alarms, that were forwarded to the user. If this limit is reached or rearmed, a message will be sent to the user.
+
+A rule has the following structure:
 
 [source]
 ----

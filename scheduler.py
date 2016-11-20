@@ -68,10 +68,16 @@ class Scheduler(object):
                         except:
                             # resolve forwarded alarms
                             for forwarding_entry in alarm_saved.forwarding_entries:
-                                if forwarding_entry.forwarded:
-                                    target = forwarding_entry.rule.target
-                                    forwarder = Forwarder.create_forwarder(target.target_name, target.target_class, target.target_parms)
+                                target = forwarding_entry.rule.target
+                                forwarder = Forwarder.create_forwarder(target.target_name, target.target_class, target.target_parms)
+                                if forwarding_entry.forwarded == "yes":
                                     forwarder.resolve_alarm(alarm_saved, forwarding_entry.forwarder_reference)
+                                # check maxforwardings
+                                forwarding_count = orm_session.query(ForwardedAlarm).\
+                                                   filter(ForwardedAlarm.rule_id==forwarding_entry.rule_id).\
+                                                   filter(ForwardedAlarm.forwarded!="no").count()
+                                if forwarding_entry.rule.rule_maxforwardings == forwarding_count:
+                                    forwarder.send_enable_forwarding()
                             # remove alarm
                             orm_session.delete(alarm_saved)
                     orm_session.commit()
@@ -89,7 +95,7 @@ class Scheduler(object):
                                 alarm_id=alarm_saved.alarm_id,
                                 alarm_source=alarm_saved.alarm_source,
                                 rule_id=rule.rule_id,
-                                forwarded=False,
+                                forwarded="no",
                                 forwarder_reference=None
                             )
                             orm_session.add(forwarded_alarm)
@@ -97,21 +103,32 @@ class Scheduler(object):
 
                 # walk through all forwardings, that were not executed yet
                 query_forwarding_alarms = orm_session.query(ForwardedAlarm, ActiveAlarm).\
-                                          filter(ForwardedAlarm.forwarded==False).\
+                                          filter(ForwardedAlarm.forwarded=="no").\
                                           filter(ForwardedAlarm.alarm_id==ActiveAlarm.alarm_id).\
                                           filter(ForwardedAlarm.alarm_source==ActiveAlarm.alarm_source).\
                                           options(joinedload("alarm.parameters"))
                 for alarm_forwarding, alarm_active in query_forwarding_alarms.all():
                     # check forwarding of alarms
                     target = alarm_forwarding.rule.target
+                    rule = alarm_forwarding.rule
                     time_diff_obj = datetime.datetime.now() - alarm_active.alarm_timestamp
                     time_diff_sec = time_diff_obj.days * 86400 + time_diff_obj.seconds
-                    if time_diff_sec >= target.target_delay:
-                        # forward alarm
-                        forwarder = Forwarder.create_forwarder(target.target_name, target.target_class, target.target_parms)
-                        alarm_forwarding.forwarder_reference = forwarder.forward_alarm(alarm_active)
-                        # set forwarded flag
-                        alarm_forwarding.forwarded=True
+                    forwarder = Forwarder.create_forwarder(target.target_name, target.target_class, target.target_parms)
+                    # check forwarding count
+                    forwarding_count = orm_session.query(ForwardedAlarm).\
+                                       filter(ForwardedAlarm.rule_id==alarm_forwarding.rule_id).\
+                                       filter(ForwardedAlarm.forwarded!="no").count()
+                    if time_diff_sec >= rule.rule_delay:
+                        if forwarding_count >= rule.rule_maxforwardings and rule.rule_maxforwardings != 0:
+                            alarm_forwarding.forwarded="suppressed"
+                            if forwarding_count == rule.rule_maxforwardings:
+                                # send message to the user
+                                forwarder.send_disable_forwarding()
+                        else:
+                            # forward alarm
+                            alarm_forwarding.forwarder_reference = forwarder.forward_alarm(alarm_active)
+                            # set forwarded flag
+                            alarm_forwarding.forwarded="yes"
                 orm_session.commit()
 
                 # close ORM session

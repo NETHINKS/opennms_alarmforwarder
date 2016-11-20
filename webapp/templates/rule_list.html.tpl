@@ -24,6 +24,14 @@
                         <input type="text" class="form-control" id="inputRule" name="rule" placeholder="alarm_uei~.*nodeDown.*">
                     </div>
                     <div class="form-group">
+                        <label for="inputDelay">Delay [sec]</label>
+                        <input type="number" class="form-control" id="inputDelay" name="delay" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="inputMaxforwardings">max forwarded active Alarms</label>
+                        <input type="number" class="form-control" id="inputMaxForwardings" name="maxforwardings" value="0">
+                    </div>
+                    <div class="form-group">
                         <label for="inputTarget">Target</label>
                         <select class="form-control" name="target" id="inputTarget">
                         {% for target in targets %}
@@ -43,12 +51,16 @@
     <table class="table table-default">
         <tr>
                 <th>Rule</th>
+                <th>Delay [sec]</th>
+                <th>max forwarded active Alarms</th>
                 <th>Target</th>
                 <th>Action</th>
         </tr>
         {% for rule in rules %}
             <tr>
                 <td>{{ rule.rule_match }}</td>
+                <td>{{ rule.rule_delay }}</td>
+                <td>{{ rule.rule_maxforwardings }}</td>
                 <td>{{ rule.rule_target }}</td>
                 <td>
                     <a href="/rules/{{ rule.rule_id }}"><span class="glyphicon glyphicon-edit"></span></a>

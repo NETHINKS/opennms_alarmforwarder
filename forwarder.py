@@ -73,6 +73,12 @@ class Forwarder(object):
     def test_forwarder(self, message=None):
         pass
 
+    def send_disable_forwarding(self):
+        pass
+
+    def send_enable_forwarding(self):
+        pass
+
     def forward_alarm(self, alarm):
         pass
 
@@ -83,6 +89,8 @@ class Forwarder(object):
 class StdoutForwarder(Forwarder):
 
     default_parameters = OrderedDict([
+        ("DisableForwardingMessage", "Forwarding of Alarms is disabled: Max count of forwardings reached."),
+        ("EnableForwardingMessage", "Forwarding of Alarms is enabled again: Max count of forwardings resolved."),
         ("AlertMessage", "Forward alarm: %alarm_timestamp% %alarm_logmsg%"),
         ("ResolvedMessage", "Resolve alarm: %alarm_timestamp% %alarm_logmsg%")
     ])
@@ -90,6 +98,14 @@ class StdoutForwarder(Forwarder):
     def test_forwarder(self, message=None):
         if not message:
             message = "This is a test of the forwarder " + self._name
+        print(message)
+
+    def send_disable_forwarding(self):
+        message = self.get_parameter("DisableForwardingMessage")
+        print(message)
+
+    def send_enable_forwarding(self):
+        message = self.get_parameter("EnableForwardingMessage")
         print(message)
 
     def forward_alarm(self, alarm):
@@ -108,6 +124,8 @@ class SmsEagleForwarder(Forwarder):
         ("user", "admin"),
         ("password", "admin"),
         ("target", "+49123456789"),
+        ("messageDisableForwarding", "Forwarding of Alarms is disabled: Max count of forwardings reached."),
+        ("messageEnableForwarding", "Forwarding of Alarms is enabled again: Max count of forwardings resolved."),
         ("messageFormatAlarm", "Alarm: %alarm_logmsg%"),
         ("messageFormatResolved", "Resolved: %alarm_logmsg%")
     ])
@@ -123,6 +141,14 @@ class SmsEagleForwarder(Forwarder):
 
     def resolve_alarm(self, alarm, reference=None):
         message = self.substitute_alarm_variables(self.get_parameter("messageFormatResolved"), alarm)
+        self.send_message(message)
+
+    def send_disable_forwarding(self):
+        message = self.get_parameter("messageDisableForwarding")
+        self.send_message(message)
+
+    def send_enable_forwarding(self):
+        message = self.get_parameter("messageEnableForwarding")
         self.send_message(message)
 
     def send_message(self, message):

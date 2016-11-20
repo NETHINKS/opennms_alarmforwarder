@@ -16,6 +16,14 @@
             <input type="text" class="form-control" id="inputMatch" name="match" value="{{ rule.rule_match }}" />
         </div>
         <div class="form-group">
+            <label for="inputDelay">Delay [sec]</label>
+            <input type="number" class="form-control" id="inputDelay" name="delay" value="{{ rule.rule_delay }}" />
+        </div>
+        <div class="form-group">
+            <label for="inputMaxforwardings">max forwarded active Alarms</label>
+            <input type="number" class="form-control" id="inputMaxforwardings" name="maxforwardings" value="{{ rule.rule_maxforwardings }}" />
+        </div>
+        <div class="form-group">
             <label for="inputTarget">Target</label>
             <select class="form-control" name="target" id="inputTarget">
                 {% for target in targets %}

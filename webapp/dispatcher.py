@@ -356,27 +356,23 @@ def add_target():
         action = "add"
         target_name = request.json["target_name"]
         target_class = request.json["target_class"]
-        target_delay = request.json["target_delay"]
         for request_parm in request.json["target_parms"]:
             parameters[request_parm] = request.json["target_parms"][request_parm]
     else:
         action = request.form["action"]
         target_name = request.form["name"]
         target_class = request.form["class"]
-        target_delay = request.form["delay"]
         default_parameters = forwarder.Forwarder.get_default_parameters(target_class)
         for request_parm in request.form:
-            if request_parm not in ["action", "class", "name", "delay"]:
+            if request_parm not in ["action", "class", "name"]:
                 parameters[request_parm] = request.form[request_parm]
     if action == "show_form":
         return render_template("target_add.html.tpl", target_name=target_name,
-                               target_class=target_class, target_delay=target_delay,
-                               target_parameters=default_parameters)
+                               target_class=target_class, target_parameters=default_parameters)
     if action == "add":
         orm_session = model.Session()
         # add target
-        target = model.Target(target_name=target_name, target_class=target_class,
-                              target_delay=target_delay)
+        target = model.Target(target_name=target_name, target_class=target_class)
         orm_session.add(target)
         # add target parameters
         for parameter in parameters:
@@ -465,12 +461,17 @@ def add_rule():
     # check, if data are form data or json
     if request.get_json(silent=True) is not None:
         rule_match = request.json["rule_match"]
+        rule_delay = request.json["rule_delay"]
+        rule_maxforwardings = request.json["rule_maxforwardings"]
         rule_target = request.json["rule_target"]
     else:
         rule_match = request.form['rule']
+        rule_delay = request.form['delay']
+        rule_maxforwardings = request.form['maxforwardings']
         rule_target = request.form['target']
     orm_session = model.Session()
-    rule = model.ForwardingRule(rule_match=rule_match, rule_target=rule_target)
+    rule = model.ForwardingRule(rule_match=rule_match, rule_delay=rule_delay,
+                                rule_maxforwardings=rule_maxforwardings, rule_target=rule_target)
     orm_session.add(rule)
     orm_session.commit()
     orm_session.close()
@@ -498,9 +499,13 @@ def edit_rule(rule_id):
         if request.get_json(silent=True) is not None:
             rule.rule_target = request.json["rule_target"]
             rule.rule_match = request.json["rule_match"]
+            rule.rule_delay = request.json["rule_delay"]
+            rule.rule_maxforwardings = request.json["rule_maxforwardings"]
         else:
             rule.rule_target = request.form["target"]
             rule.rule_match = request.form["match"]
+            rule.rule_delay = request.form["delay"]
+            rule.rule_maxforwardings = request.form["maxforwardings"]
         orm_session.commit()
         orm_session.close()
         result_msg = "Rule successfully changed"

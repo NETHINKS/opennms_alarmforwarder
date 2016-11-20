@@ -63,6 +63,8 @@ class ForwardingRule(Base):
 
     rule_id = Column(Integer, primary_key=True)
     rule_match = Column(String)
+    rule_delay = Column(Integer)
+    rule_maxforwardings = Column(Integer)
     rule_target = Column(String, ForeignKey("target.target_name"))
 
     forwarding_entries = relationship("ForwardedAlarm", cascade="all, delete-orphan")
@@ -72,6 +74,8 @@ class ForwardingRule(Base):
         data = OrderedDict([
             ("rule_id", self.rule_id),
             ("rule_match", self.rule_match),
+            ("rule_delay", self.rule_delay),
+            ("rule_maxforwardings", self.rule_maxforwardings),
             ("rule_target", self.rule_target)
         ])
         return data
@@ -83,7 +87,7 @@ class ForwardedAlarm(Base):
     alarm_id = Column(Integer, primary_key=True)
     alarm_source = Column(String, primary_key=True)
     rule_id = Column(Integer, ForeignKey("forwarding_rule.rule_id"), primary_key=True)
-    forwarded = Column(Boolean)
+    forwarded = Column(String)
     forwarder_reference = Column(String)
 
     __table_args__ = (ForeignKeyConstraint(["alarm_id", "alarm_source"], ["active_alarm.alarm_id", "active_alarm.alarm_source"]), {})
@@ -97,7 +101,6 @@ class Target(Base):
 
     target_name = Column(String, primary_key=True)
     target_class = Column(String)
-    target_delay = Column(Integer)
     target_parms = relationship("TargetParameter", cascade="all, delete-orphan")
 
     forwarding_rules = relationship("ForwardingRule", cascade="all, delete-orphan")
@@ -106,7 +109,6 @@ class Target(Base):
         data = OrderedDict([
             ("target_name", self.target_name),
             ("target_class", self.target_class),
-            ("target_delay", self.target_delay),
             ("target_parms", {parm.parameter_name: parm.parameter_value for parm in self.target_parms})
         ])
         return data

@@ -35,10 +35,6 @@
                         {% endfor %}
                         </select>
                     </div>
-                    <div class="form-group">
-                        <label for="inputDelay">Target Delay [sec]</label>
-                        <input type="number" class="form-control" id="inputDelay" name="delay" value="0" placeholder="Delay">
-                    </div>
                     <button type="submit" class="btn btn-primary">Submit</button>
                 </form>
             </div>
@@ -53,14 +49,12 @@
         <tr>
                 <th>Name</th>
                 <th>Class</th>
-                <th>Delay [sec]</th>
                 <th>Action</th>
         </tr>
         {% for target in targets %}
             <tr>
                 <td>{{ target.target_name }}</td>
                 <td>{{ target.target_class }}</td>
-                <td>{{ target.target_delay }}</td>
                 <td>
                     <a href="/targets/{{ target.target_name }}/test"><span class="glyphicon glyphicon-ok"></span></a>
                     <a href="/targets/{{ target.target_name }}"><span class="glyphicon glyphicon-edit"></span></a>
