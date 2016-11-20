@@ -23,6 +23,15 @@ class AuthenticationProvider(object):
         classobj = getattr(sys.modules[__name__], classname)
         return classobj()
 
+class HybridLocalLdapAuthenticationProvider(AuthenticationProvider):
+
+    def authenticate(self, username, password):
+        localAuthProvider = LocalUserAuthenticationProvider()
+        ldapAuthProvider = LdapAuthenticationProvider()
+        ret_value = localAuthProvider.authenticate(username, password)
+        if not ret_value:
+            ret_value = ldapAuthProvider.authenticate(username, password)
+        return ret_value
 
 class LocalUserAuthenticationProvider(AuthenticationProvider):
 
