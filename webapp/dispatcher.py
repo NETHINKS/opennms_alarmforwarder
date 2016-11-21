@@ -25,7 +25,11 @@ app.secret_key = 'msdniuf7go832gfvzuztcur65'
 @app.route("/")
 @AuthenticationHandler.login_required
 def index():
-    return render_template("index.html.tpl")
+    orm_session = model.Session()
+    sources = orm_session.query(model.Source).all()
+    rules = orm_session.query(model.ForwardingRule).all()
+    orm_session.close()
+    return render_template("index.html.tpl", sources=sources, rules=rules)
 
 @app.route("/login", methods=["GET", "POST"])
 def login():

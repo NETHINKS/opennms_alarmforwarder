@@ -11,6 +11,11 @@ a span.glyphicon
 
 
 /* navbar */
+.navbar
+{
+    border-radius:      0px;
+}
+
 .navbar-brand
 {
     padding:            0px;
@@ -31,18 +36,36 @@ a span.glyphicon
     padding-left:       10px;
 }
 
-.navbar-header a
+.navbar-nav a, .navbar-brand
 {
     color:              #FFFFFF !important;
 }
 
+.navbar-nav ul.dropdown-menu
+{
+    color:              #FFFFFF;
+    background-color:   #000000;
+}
+
+.navbar-nav ul.dropdown-menu a:hover, .navbar-nav ul.dropdown-menu a:focus
+{
+    color:          #FFFFFF;
+    background-color:   #222222;
+}
+
+
 /* content: h1 */
-h1
+h1, h2
 {
     text-align:         center;
 }
 
-h1 span.glyphicon
+.table
+{
+    margin-bottom:      90px;
+}
+
+h1 span.glyphicon, h2 span.glyphicon
 {
     padding-right:      10px;
 }
