@@ -5,6 +5,10 @@
     <li role="presentation">
         <a href="/targets"><span class="glyphicon glyphicon-list"></span>List Targets</a>
     </li>
+    <li role="presentation"><a href="/docs#_targets" target="_blank">
+                                <span class="glyphicon glyphicon-question-sign"></span>Help
+                            </a>
+    </li>
 </ul>
 
 <h1><span class="glyphicon glyphicon-log-out"></span>Target {{ target.target_name }}</h1>

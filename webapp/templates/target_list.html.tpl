@@ -6,6 +6,10 @@
                                 <span class="glyphicon glyphicon-plus"></span>Add Target
                             </a>
     </li>
+    <li role="presentation"><a href="/docs#_targets" target="_blank">
+                                <span class="glyphicon glyphicon-question-sign"></span>Help
+                            </a>
+    </li>
 </ul>
 
 

@@ -5,6 +5,10 @@
     <li role="presentation">
         <a href="/rules"><span class="glyphicon glyphicon-list"></span>List Forwarding Rules</a>
     </li>
+    <li role="presentation"><a href="/docs#_forwarding_rules" target="_blank">
+                                <span class="glyphicon glyphicon-question-sign"></span>Help
+                            </a>
+    </li>
 </ul>
 
 <h1><span class="glyphicon glyphicon-random"></span>Rule {{ rule.rule_id }}</h1>

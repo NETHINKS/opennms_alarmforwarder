@@ -41,6 +41,16 @@
                     </ul>
                 </li>
 
+                <!-- Dropdown: help menu -->
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">
+                        <span class="glyphicon glyphicon-question-sign"></span>Help<span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a href="/docs" target="_blank"><span class="glyphicon glyphicon-book"></span>Documentation</a></li>
+                        <li><a href="https://github.com/NETHINKS/opennms_alarmforwarder" target="_blank"><span class="glyphicon glyphicon-globe"></span>GitHub Project</a></li>
+                    </ul>
+                </li>
 
                 <!-- Dropdown: user menu -->
                 <li class="dropdown">

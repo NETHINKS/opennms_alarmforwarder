@@ -5,6 +5,10 @@
     <li role="presentation">
         <a href="/sources"><span class="glyphicon glyphicon-list"></span>List Sources</a>
     </li>
+    <li role="presentation"><a href="/docs#_sources" target="_blank">
+                                <span class="glyphicon glyphicon-question-sign"></span>Help
+                            </a>
+    </li>
 </ul>
 
 

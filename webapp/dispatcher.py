@@ -2,6 +2,7 @@ import os
 from flask import Flask
 from flask import flash
 from flask import jsonify
+from flask import send_from_directory
 from flask import render_template
 from flask import request
 from flask import redirect
@@ -17,7 +18,7 @@ from webapp.json_helper import json_check
 from webapp.json_helper import json_result
 from webapp.json_helper import json_error
 
-basedir = os.path.dirname(__file__)
+basedir = os.path.dirname(os.path.abspath(__file__))
 app = Flask("opennms_alarmforwarder", template_folder=basedir+"/templates",
             static_folder=basedir+"/static")
 app.secret_key = 'msdniuf7go832gfvzuztcur65'
@@ -30,6 +31,13 @@ def index():
     rules = orm_session.query(model.ForwardingRule).all()
     orm_session.close()
     return render_template("index.html.tpl", sources=sources, rules=rules)
+
+@app.route("/docs")
+def documentation():
+    basedir = os.path.dirname(os.path.abspath(__file__))
+    docs_dir = basedir + "/../docs/html"
+    docs_file = "documentation.html"
+    return send_from_directory(docs_dir, docs_file)
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
