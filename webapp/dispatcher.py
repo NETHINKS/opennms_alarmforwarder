@@ -316,6 +316,13 @@ def add_source():
         source_user = request.form["user"]
         source_password = request.form["password"]
         source_filter = request.form["filter"]
+    # check source name
+    if source_name == "":
+        message = "Error adding Source. Name may not be empty"
+        if json_check():
+            return json_error(message, 500)
+        flash(message, "alert-danger")
+        return redirect("/sources")
     # add source
     orm_session = model.Session()
     source = model.Source(source_name=source_name, source_url=source_url, source_user=source_user,
@@ -459,6 +466,13 @@ def add_target():
         return render_template("target_add.html.tpl", target_name=target_name,
                                target_class=target_class, target_parameters=default_parameters)
     if action == "add":
+        # check target name
+        if target_name == "":
+            message = "Error adding Target. Name may not be empty"
+            if json_check():
+                return json_error(message, 500)
+            flash(message, "alert-danger")
+            return redirect("/targets")
         orm_session = model.Session()
         # add target
         target = model.Target(target_name=target_name, target_class=target_class)
