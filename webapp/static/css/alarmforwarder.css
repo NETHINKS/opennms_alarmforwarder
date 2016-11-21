@@ -9,6 +9,12 @@ a span.glyphicon
     padding-right:      5px;
 }
 
+/* messagebar */
+.alert
+{
+    margin-right:       10px;
+    margin-left:        10px;
+}
 
 /* navbar */
 .navbar
