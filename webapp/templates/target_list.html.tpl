@@ -12,7 +12,7 @@
 <h1><span class="glyphicon glyphicon-log-out"></span>Targets</h1>
 
 <!-- modal: add new target -->
-<div class="modal fade" id="modalAddTarget" role="dialog">
+<div class="modal fade" id="modalAddTarget" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -56,9 +56,9 @@
                 <td>{{ target.target_name }}</td>
                 <td>{{ target.target_class }}</td>
                 <td>
-                    <a href="/targets/{{ target.target_name }}/test"><span class="glyphicon glyphicon-ok"></span></a>
-                    <a href="/targets/{{ target.target_name }}"><span class="glyphicon glyphicon-edit"></span></a>
-                    <a href="/targets/{{ target.target_name }}/delete"><span class="glyphicon glyphicon-remove"></span></a>
+                    <a href="/targets/{{ target.target_name }}/test" title="test target"><span class="glyphicon glyphicon-ok"></span></a>
+                    <a href="/targets/{{ target.target_name }}" title="edit target"><span class="glyphicon glyphicon-edit"></span></a>
+                    <a href="/targets/{{ target.target_name }}/delete" title="delete target"><span class="glyphicon glyphicon-remove"></span></a>
                 </td>
             </tr>
         {% endfor %}

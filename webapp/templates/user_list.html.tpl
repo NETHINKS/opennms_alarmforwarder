@@ -12,7 +12,7 @@
 <h1><span class="glyphicon glyphicon-user"></span>Local Users</h1>
 
 <!-- modal: add new user -->
-<div class="modal fade" id="modalAddUser" role="dialog">
+<div class="modal fade" id="modalAddUser" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -50,8 +50,8 @@
                 <tr>
                     <td>{{ user.user_name }}</td>
                     <td>
-                        <a href="/admin/users/{{ user.user_name }}"><span class="glyphicon glyphicon-edit"></span></a>
-                        <a href="/admin/users/{{ user.user_name }}/delete"><span class="glyphicon glyphicon-remove"></span></a>
+                        <a href="/admin/users/{{ user.user_name }}" title="edit user"><span class="glyphicon glyphicon-edit"></span></a>
+                        <a href="/admin/users/{{ user.user_name }}/delete" title="delete user"><span class="glyphicon glyphicon-remove"></span></a>
                     </td>
                 </tr>
         {% endfor %}

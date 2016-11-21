@@ -9,7 +9,7 @@
 </ul>
 
 <!-- modal: add new rule -->
-<div class="modal fade" id="modalAddRule" role="dialog">
+<div class="modal fade" id="modalAddRule" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -63,8 +63,8 @@
                 <td>{{ rule.rule_maxforwardings }}</td>
                 <td>{{ rule.rule_target }}</td>
                 <td>
-                    <a href="/rules/{{ rule.rule_id }}"><span class="glyphicon glyphicon-edit"></span></a>
-                    <a href="/rules/{{ rule.rule_id }}/delete"><span class="glyphicon glyphicon-remove"></span></a>
+                    <a href="/rules/{{ rule.rule_id }}" title="edit rule"><span class="glyphicon glyphicon-edit"></span></a>
+                    <a href="/rules/{{ rule.rule_id }}/delete" title="delete rule"><span class="glyphicon glyphicon-remove"></span></a>
                 </td>
             </tr>
         {% endfor %}

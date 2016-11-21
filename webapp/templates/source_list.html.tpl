@@ -11,7 +11,7 @@
 
 
 <!-- modal: add new target -->
-<div class="modal fade" id="modalAddSource" role="dialog">
+<div class="modal fade" id="modalAddSource" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -78,9 +78,9 @@
                     <td>{{ source.source_user }}</td>
                     <td>{{ source.source_filter }}</td>
                     <td>
-                        <a href="/sources/{{ source.source_name }}/test"><span class="glyphicon glyphicon-ok"></span></a>
-                        <a href="/sources/{{ source.source_name }}"><span class="glyphicon glyphicon-edit"></span></a>
-                        <a href="/sources/{{ source.source_name }}/delete"><span class="glyphicon glyphicon-remove"></span></a>
+                        <a href="/sources/{{ source.source_name }}/test" title="test source"><span class="glyphicon glyphicon-ok"></span></a>
+                        <a href="/sources/{{ source.source_name }}" title="edit source"><span class="glyphicon glyphicon-edit"></span></a>
+                        <a href="/sources/{{ source.source_name }}/delete" title="delete source"><span class="glyphicon glyphicon-remove"></span></a>
                     </td>
                 </tr>
         {% endfor %}
