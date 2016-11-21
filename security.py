@@ -62,8 +62,29 @@ class LocalUserAuthenticationProvider(AuthenticationProvider):
             return False
         return True
 
+    def get_user(self, username):
+        try:
+            orm_session = model.Session()
+            user = orm_session.query(model.LocalUser).\
+                               filter(model.LocalUser.user_name==username).\
+                               first()
+            orm_session.close()
+        except:
+            return None
+        return user
+
     def change_password(self, username, password):
-        pass
+        try:
+            orm_session = model.Session()
+            user = orm_session.query(model.LocalUser).\
+                               filter(model.LocalUser.user_name==username).\
+                               first()
+            user.password_hash = self.__hash_password(password)
+            orm_session.commit()
+            orm_session.close()
+        except:
+            return False
+        return True
 
     def delete_user(self, username):
         orm_session = model.Session()

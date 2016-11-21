@@ -51,6 +51,46 @@ def logout():
     AuthenticationHandler.logout()
     return redirect("/")
 
+@app.route("/password-change",  methods=['GET', 'POST'])
+@AuthenticationHandler.login_required
+def get_password_change():
+    # handle GET request: show password change form
+    if request.method == "GET":
+        return render_template("user_password_change.html.tpl")
+    # check, if data are form data or json
+    if request.get_json(silent=True) is not None:
+        # add source from json data
+        password_old = request.json["password-old"]
+        password_new = request.json["password-new"]
+        password_new2 = request.json["password-new2"]
+    else:
+        password_old = request.form["password-old"]
+        password_new = request.form["password-new"]
+        password_new2 = request.form["password-new2"]
+    username = session["username"]
+    # check authentication
+    local_auth_provider = security.LocalUserAuthenticationProvider()
+    if not local_auth_provider.authenticate(username, password_old):
+        message = "Sorry, could not change password, old password wrong."
+        if json_check():
+            return json_error(message, 401)
+        flash(message, "alert-danger")
+        return redirect("/password-change")
+    # check if passwords match
+    if (password_new != password_new2) or password_new == "":
+        message = "Sorry, could not change password, passwords does not match"
+        if json_check():
+            return json_error(message, 500)
+        flash(message, "alert-danger")
+        return redirect("/password-change")
+    # set new password
+    local_auth_provider.change_password(username, password_new)
+    message = "Password changed successfully"
+    if json_check():
+        return json_result(message, 200)
+    flash(message,  "alert-success")
+    return redirect("/")
+
 
 
 @app.route("/admin/users")
@@ -61,6 +101,21 @@ def get_user_list():
     if json_check():
         return jsonify(items=[user.dict_repr() for user in users])
     return render_template("user_list.html.tpl", users=users)
+
+@app.route("/admin/users/<name>")
+@AuthenticationHandler.login_required
+def get_user(name):
+    local_auth_provider = security.LocalUserAuthenticationProvider()
+    user = local_auth_provider.get_user(name)
+    if user is None:
+        message = "User %s not found" % name
+        if json_check():
+            return json_error(message, 404)
+        flash(message, "alert-danger")
+        return redirect("/admin/users")
+    if json_check():
+        return jsonify(user.diect_repr())
+    return render_template("user_view.html.tpl", user=user)
 
 @app.route("/admin/users/add", methods=['POST'])
 @AuthenticationHandler.login_required
@@ -113,8 +168,30 @@ def delete_user(name):
         flash(message, "alert-success")
         return redirect("/admin/users")
 
-
-
+@app.route("/admin/users/<name>/edit", methods=['POST'])
+@AuthenticationHandler.login_required
+def edit_user(name):
+    local_auth_provider = security.LocalUserAuthenticationProvider()
+    user = local_auth_provider.get_user(name)
+    if user is None:
+        message = "User " + name + " not found"
+        if json_check():
+            return json_error(message, 404)
+        flash(message, "alert-danger")
+        return redirect("/admin/users")
+    if request.get_json(silent=True) is not None:
+        # update user from json data
+        password = request.json["user_password"]
+    else:
+        # update user from form data
+        password = request.form["password"]
+    local_auth_provider.change_password(name, password)
+    message = "User " + name + " successfully updated"
+    if json_check():
+        return json_result(message, 200)
+    flash(message, "alert-success")
+    return redirect("/admin/users")
+ 
 
 
 @app.route("/sources")

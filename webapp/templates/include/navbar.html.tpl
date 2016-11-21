@@ -48,6 +48,7 @@
                         <span class="glyphicon glyphicon-user"></span>User: {{ session.username }}<span class="caret"></span>
                     </a>
                     <ul class="dropdown-menu">
+                        <li><a href="/password-change"><span class="glyphicon glyphicon-cog"></span>Change Password</a></li>
                         <li><a href="/logout"><span class="glyphicon glyphicon-off"></span>Logout</a></li>
                     </ul>
                 </li>

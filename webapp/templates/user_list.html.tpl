@@ -50,6 +50,7 @@
                 <tr>
                     <td>{{ user.user_name }}</td>
                     <td>
+                        <a href="/admin/users/{{ user.user_name }}"><span class="glyphicon glyphicon-edit"></span></a>
                         <a href="/admin/users/{{ user.user_name }}/delete"><span class="glyphicon glyphicon-remove"></span></a>
                     </td>
                 </tr>
