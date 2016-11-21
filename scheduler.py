@@ -5,6 +5,7 @@ This module defines the scheduler part of opennms_alarmforwarder
 
 import datetime
 import time
+import logging
 from sqlalchemy.sql import exists
 from sqlalchemy.orm import joinedload
 import model
@@ -21,14 +22,17 @@ class Scheduler(object):
 
     def __init__(self):
         self.__config = config.Config()
+        self.__logger = logging.getLogger("scheduler")
 
     def run(self):
-        try:
-            # create objects
-            rule_evaluator = RuleEvaluator()
+        self.__logger.info("scheduler start")
 
-            # scheduling loop
-            while True:
+        # create objects
+        rule_evaluator = RuleEvaluator()
+
+        # scheduling loop
+        while True:
+            try:
                 # open ORM session
                 orm_session = model.Session()
 
@@ -136,7 +140,12 @@ class Scheduler(object):
 
                 # wait time limit for the next scheduler run
                 time.sleep(int(self.__config.get_value("Scheduler", "queryInterval", "30")))
-        except GracefulShutdown:
-            pass
-        except KeyboardInterrupt:
-            pass
+            except GracefulShutdown:
+                self.__logger.info("scheduler shutdown")
+                break
+            except KeyboardInterrupt:
+                self.__logger.info("scheduler shutdown")
+                break
+            except Exception as e:
+                self.__logger.error("Error in scheduler - restarting: %s", e)
+                continue
