@@ -1,7 +1,7 @@
 #!/bin/sh
 
 ### BEGIN INIT INFO
-# Provides:          alarmRetarder
+# Provides:          alarmforwarder
 # Required-Start:    $network $local_fs $remote_fs
 # Required-Stop:     $network $local_fd $remote_fs
 # X-Start-Before: 
