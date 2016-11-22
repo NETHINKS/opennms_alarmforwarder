@@ -1,4 +1,10 @@
-"""model of opennms_alarmforwarder
+"""
+Model module
+
+This module defines the data model of AlarmForwarder
+
+:license: MIT, see LICENSE for more details
+:copyright: (c) 2016 by NETHINKS GmbH, see AUTORS for more details
 """
 
 from collections import OrderedDict

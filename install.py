@@ -1,5 +1,12 @@
 #! /usr/bin/python3
-"""Setup module
+"""
+AlarmForwarder setup module
+
+This is the setup module of AlarmForwarder. It does some
+initialization before the first start
+
+:license: MIT, see LICENSE for more details
+:copyright: (c) 2016 by NETHINKS GmbH, see AUTORS for more details
 """
 import binascii
 import os
@@ -8,6 +15,8 @@ import model
 import security
 
 def main():
+    """main function"""
+
     print("AlarmForwarder Setup:")
 
     # create database structure

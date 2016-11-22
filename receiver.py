@@ -1,5 +1,11 @@
-"""receiver modul"""
+"""
+Receiver module
 
+This module defines the receiver for OpenNMS alarms
+
+:license: MIT, see LICENSE for more details
+:copyright: (c) 2016 by NETHINKS GmbH, see AUTORS for more details
+"""
 import datetime
 import logging
 import xml.etree.ElementTree
@@ -64,7 +70,7 @@ class OpennmsReceiver(object):
             raise
         if response.status_code != 200:
             error_msg = "could not connect to source " + self.__source.source_name
-            error_msg+= ": HTTP/" + str(response.status_code)
+            error_msg += ": HTTP/" + str(response.status_code)
             self.__logger.error(error_msg)
             raise Exception(error_msg)
 
@@ -134,7 +140,7 @@ class OpennmsReceiver(object):
                 alarm_operinstruct=alarm_operinstruct
             )
             alarms[alarm_id] = created_alarm
-            parameters[alarm_id] =  alarm_parameters
+            parameters[alarm_id] = alarm_parameters
 
         # return alarm_data map
         alarm_data = {}

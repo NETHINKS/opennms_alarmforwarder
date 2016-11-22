@@ -1,41 +1,78 @@
-"""Forwarding module for opennms_alarmforwarder"""
+"""
+Forwarder module
 
+This is the Forwarder module of AlarmForwarder
+
+:license: MIT, see LICENSE for more details
+:copyright: (c) 2016 by NETHINKS GmbH, see AUTORS for more details
+"""
 import email
 from email.mime.text import MIMEText
-import inspect
 import json
 import logging
 import re
 import smtplib
 import sys
+from collections import OrderedDict
 import requests
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
-from collections import OrderedDict
 
 class Forwarder(object):
+    """Abstract Forwarder class
+
+    This class must be extended to create your own Forwarder.
+
+    Args:
+        - name:  name of the Forwarder
+        - parameters: dict with Forwarder parameters
+    """
 
     default_parameters = OrderedDict()
 
     def __init__(self, name, parameters):
+        """initialization method"""
         self._name = name
         self._parameters = parameters
         self._logger = logging.getLogger("forwarder")
 
+    @staticmethod
     def get_forwarder_classnames():
+        """Returns a list with all forwarder classes"""
         classnames = []
         for class_element in Forwarder.__subclasses__():
             classnames.append(class_element.__name__)
         return classnames
 
+    @staticmethod
     def create_forwarder(name, classname, parameter):
+        """Creates an instance of a forwarder
+
+        Args:
+            - name: Name of the Forwarder
+            - classname: Forwarder class
+            - parameter: dict with parameters for the Forwarder
+
+        Returns:
+            an instance of a specific forwarder
+        """
         classobj = getattr(sys.modules[__name__], classname)
         return classobj(name, parameter)
 
+    @staticmethod
     def get_default_parameters(classname):
+        """Returns the default parameters for a specific forwarder"""
         classobj = getattr(sys.modules[__name__], classname)
         return classobj.default_parameters
 
     def get_parameter(self, name):
+        """Returns the value of a parameter
+        Args:
+            - name: name of the parameter
+
+        Returns:
+            the value of the parameter or an empty string if the
+            parameter does not exist.
+        """
         value = ""
         try:
             value = type(self).default_parameters[name]
@@ -47,7 +84,18 @@ class Forwarder(object):
         return value
 
     def substitute_alarm_variables(self, input_string, alarm):
+        """Substitute variables in an input string with values
+        from a specific alarm.
+
+        Args:
+            - input string: input string with variables
+            - alarm: alarm object
+
+        Returns:
+            input string with replaced variables
+        """
         def substitute_var(match):
+            """substitute an alarm variable"""
             replaced_var = match.group(0)
             try:
                 replaced_var = str(getattr(alarm, match.group(1)))
@@ -56,6 +104,7 @@ class Forwarder(object):
             return replaced_var
 
         def substitute_parm(match):
+            """substitute an alarm parameter"""
             replaced_var = match.group(0)
             try:
                 for alarm_parm in alarm.parameters:
@@ -71,22 +120,51 @@ class Forwarder(object):
         return output
 
     def test_forwarder(self, message=None):
+        """Sends a test message with the forwarder
+        Should be implemented in own Forwarder classes
+
+        Args:
+            - message: string with test message
+        """
         pass
 
     def send_disable_forwarding(self):
+        """Sends a message that forwarding is now disabled
+        Should be implemented in own Forwarder classes
+        """
         pass
 
     def send_enable_forwarding(self):
+        """Sends a message that forwarding is now enabled
+        Should be implemented in own Forwarder classes
+        """
         pass
 
     def forward_alarm(self, alarm):
+        """Forwards a specific alarm
+        Must be implemented in own Forwarder classes.
+
+        Args:
+            - alarm: alarm object
+
+        Returns:
+            - Reference to the forwarded alarm or None
+        """
         pass
 
     def resolve_alarm(self, alarm, reference=None):
+        """Forwards a resolved message
+        Should be implemented in own Forwarder classes.
+
+        Args:
+            - alarm: alarm object
+            - reference: reference to the forwarded alarm or None
+        """
         pass
 
 
 class StdoutForwarder(Forwarder):
+    """Forwarder: send messages to Stdout"""
 
     default_parameters = OrderedDict([
         ("DisableForwardingMessage", "Forwarding of Alarms is disabled: Max count of forwardings reached."),
@@ -118,6 +196,7 @@ class StdoutForwarder(Forwarder):
 
 
 class SmsEagleForwarder(Forwarder):
+    """Forwarder: send messages to SMSEagle appliance"""
 
     default_parameters = OrderedDict([
         ("url", "http://127.0.0.1/index.php/http_api/send_sms"),
@@ -152,6 +231,11 @@ class SmsEagleForwarder(Forwarder):
         self.send_message(message)
 
     def send_message(self, message):
+        """send message
+
+        Args:
+            - message: message to send
+        """
         # set parameters
         target = self.get_parameter("target")
         url = self.get_parameter("url")
@@ -177,6 +261,7 @@ class SmsEagleForwarder(Forwarder):
 
 
 class EmailForwarder(Forwarder):
+    """Forwarder: send messages by mail"""
 
     default_parameters = OrderedDict([
         ("smtpServer", "127.0.0.1"),
@@ -208,6 +293,12 @@ class EmailForwarder(Forwarder):
         self.send_message(subject, message)
 
     def send_message(self, subject, message):
+        """send message
+
+        Args:
+            - message: message to send
+            - subject: e-mail subject
+        """
         # set parameters
         from_address = self.get_parameter("fromAddress")
         to_address = self.get_parameter("target")
@@ -237,6 +328,7 @@ class EmailForwarder(Forwarder):
             self._logger.error("Could not send mail to %s: subject: %s", to_address, message)
 
 class OtrsTicketForwarder(Forwarder):
+    """Forwarder: create and close OTRS tickets for alarms"""
 
     default_parameters = OrderedDict([
         ("otrsRestUrl", "http://localhost/otrs/nph-genericinterface.pl/Webservice/OpenNMS"),
@@ -271,6 +363,16 @@ class OtrsTicketForwarder(Forwarder):
         self.update_ticket(reference, subject, message)
 
     def create_ticket(self, subject, message, additional_fields):
+        """creates an OTRS ticket
+
+        Args:
+            - subject: ticket subject
+            - message: ticket message
+            - additional_fields: content of additional fields
+
+        Returns:
+            Returns the ticket ID
+        """
         result_ticketid = "0"
         url = self.get_parameter("otrsRestUrl")
         user = self.get_parameter("otrsRestUser")
@@ -278,7 +380,7 @@ class OtrsTicketForwarder(Forwarder):
         queue = self.get_parameter("otrsQueue")
 
         # parse additional fields
-        additional_fields_map =  {}
+        additional_fields_map = {}
         for data in filter(None, additional_fields.split(";")):
             match = re.match("(.*?)=(.*)", data)
             if match:
@@ -330,6 +432,16 @@ class OtrsTicketForwarder(Forwarder):
         return result_ticketid
 
     def update_ticket(self, ticket_id, subject, message):
+        """Updates an OTRS ticket
+
+        Args:
+            - ticket_id: OTRS Ticket ID
+            - subject: subject of new article
+            - message: message of new article
+
+        Returns:
+            the ticket ID of the updated ticket
+        """
         result_ticketid = "0"
         url = self.get_parameter("otrsRestUrl")
         user = self.get_parameter("otrsRestUser")

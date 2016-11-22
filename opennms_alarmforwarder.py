@@ -1,14 +1,18 @@
 #! /usr/bin/python3
-"""Main module
+"""
+AlarmForwarder main module
+
+This is the main module of AlarmForwarder
+
+:license: MIT, see LICENSE for more details
+:copyright: (c) 2016 by NETHINKS GmbH, see AUTORS for more details
 """
 from multiprocessing import Process
 import signal
 import os
 import logging
 import logging.config
-import model
 import process_helper
-from receiver import OpennmsReceiver
 from scheduler import Scheduler
 from config import Config
 from gunicorn_integration import WebApplication
@@ -16,6 +20,8 @@ from webapp.dispatcher import app as wsgi_app
 
 
 def main():
+    """main function"""
+
     # get directory name
     basedir = os.path.dirname(os.path.abspath(__file__))
 

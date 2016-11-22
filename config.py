@@ -1,6 +1,12 @@
-"""Config module.
-This module defines the class for getting configuration options
 """
+Config module
+
+This module defines the class for getting configuration options
+
+:license: MIT, see LICENSE for more details
+:copyright: (c) 2016 by NETHINKS GmbH, see AUTORS for more details
+"""
+
 import os
 import configparser
 
