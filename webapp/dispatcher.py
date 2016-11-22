@@ -13,15 +13,23 @@ import model
 import forwarder
 import receiver
 import security
+from config import Config
 from webapp.auth import AuthenticationHandler
 from webapp.json_helper import json_check
 from webapp.json_helper import json_result
 from webapp.json_helper import json_error
 
-basedir = os.path.dirname(os.path.abspath(__file__))
-app = Flask("opennms_alarmforwarder", template_folder=basedir+"/templates",
-            static_folder=basedir+"/static")
-app.secret_key = 'msdniuf7go832gfvzuztcur65'
+app = Flask("opennms_alarmforwarder")
+
+@app.before_first_request
+def app_init():
+    config = Config()
+    basedir = os.path.dirname(os.path.abspath(__file__))
+    app.root_path = basedir
+    app.secret_key = config.get_value("Webserver", "secret", "notsosecretkey")
+
+
+
 
 @app.route("/")
 @AuthenticationHandler.login_required

@@ -43,3 +43,23 @@ class Config(object):
 
         # return value
         return output
+
+    def set_value(self, section_name, key, value):
+        """Sets a configuration value.
+        This function sets a configuration value and write the changes
+        to the configuration file.
+        Args:
+            section_name: name of the configuration section.
+            key: key of the configuration option.
+            value: value of the configuration option.
+        """
+        # set value in data structure
+        try:
+            self.__config[section_name]
+        except:
+            self.__config[section_name] = {}
+        self.__config[section_name][key] = value
+
+        # save configuration file
+        with open(self.__filename, 'w') as configfile:
+            self.__config.write(configfile)
