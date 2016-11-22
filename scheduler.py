@@ -1,8 +1,11 @@
-"""Scheduler module
+"""
+Scheduler module
 
 This module defines the scheduler part of opennms_alarmforwarder
-"""
 
+:license: MIT, see LICENSE for more details
+:copyright: (c) 2016 by NETHINKS GmbH, see AUTORS for more details
+"""
 import datetime
 import time
 import logging
@@ -19,12 +22,15 @@ import config
 from process_helper import GracefulShutdown
 
 class Scheduler(object):
+    """Scheduler class"""
 
     def __init__(self):
+        """initialization method"""
         self.__config = config.Config()
         self.__logger = logging.getLogger("scheduler")
 
     def run(self):
+        """run method"""
         self.__logger.info("scheduler start")
 
         # create objects

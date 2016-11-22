@@ -1,3 +1,12 @@
+"""
+Flask dispatcher module
+
+This module defines the Flask app
+
+:license: MIT, see LICENSE for more details
+:copyright: (c) 2016 by NETHINKS GmbH, see AUTORS for more details
+"""
+
 import os
 from flask import Flask
 from flask import flash
@@ -71,7 +80,7 @@ def logout():
     AuthenticationHandler.logout()
     return redirect("/")
 
-@app.route("/password-change",  methods=['GET', 'POST'])
+@app.route("/password-change", methods=['GET', 'POST'])
 @AuthenticationHandler.login_required
 def get_password_change():
     # handle GET request: show password change form
@@ -108,7 +117,7 @@ def get_password_change():
     message = "Password changed successfully"
     if json_check():
         return json_result(message, 200)
-    flash(message,  "alert-success")
+    flash(message, "alert-success")
     return redirect("/")
 
 
@@ -211,7 +220,7 @@ def edit_user(name):
         return json_result(message, 200)
     flash(message, "alert-success")
     return redirect("/admin/users")
- 
+
 
 
 @app.route("/sources")

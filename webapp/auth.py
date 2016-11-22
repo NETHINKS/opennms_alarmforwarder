@@ -1,5 +1,11 @@
-"""auth module for webapp"""
+"""
+Webapp auth module
 
+This module defines authentication for the webapp
+
+:license: MIT, see LICENSE for more details
+:copyright: (c) 2016 by NETHINKS GmbH, see AUTORS for more details
+"""
 from functools import wraps
 from flask import redirect
 from flask import request
@@ -10,8 +16,14 @@ from webapp.json_helper import json_error
 import security
 
 class AuthenticationHandler(object):
+    """Class for handling authentication in Flask app"""
 
+    @staticmethod
     def login_required(func):
+        """decorator for login required
+        This decorator can be used for declaring a function
+        which requires authentication
+        """
         @wraps(func)
         def handle_login_required(*args, **kwargs):
             # try to get username from session
@@ -38,8 +50,9 @@ class AuthenticationHandler(object):
             return redirect("/login")
         return handle_login_required
 
-
+    @staticmethod
     def login(username, password):
+        """login handling"""
         # try to authenticate the user
         authprovider = security.AuthenticationProvider.get_authprovider()
         if authprovider.authenticate(username, password):
@@ -49,7 +62,9 @@ class AuthenticationHandler(object):
         return False
 
 
+    @staticmethod
     def logout():
+        """logout handling"""
         try:
             # remove session variable
             del session["username"]

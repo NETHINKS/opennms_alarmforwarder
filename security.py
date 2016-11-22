@@ -1,5 +1,11 @@
-"""authentication module"""
+"""
+authentication module
 
+This module defines authentication classes
+
+:license: MIT, see LICENSE for more details
+:copyright: (c) 2016 by NETHINKS GmbH, see AUTORS for more details
+"""
 import model
 import config
 import hashlib
@@ -8,15 +14,34 @@ import sys
 import logging
 
 class AuthenticationProvider(object):
+    """Abstract Authentication Provider
+    This class must be implemented to provide your own
+    authentication methods
+    """
 
     def __init__(self):
+        """initialization method"""
         self._config = config.Config()
         self._logger = logging.getLogger("security")
 
     def authenticate(self, username, password):
-        raise ImplementationError
+        """authentication function
+        This stub must be implemented to provide your own
+        authentication method.
 
+        Args:
+            - username: username for user login
+            - password: password for user login
+
+        Returns:
+            True, if authentication was successful
+            False, if not.
+        """
+        raise NotImplementedError
+
+    @staticmethod
     def get_authprovider():
+        """Returns the configured authentication provider"""
         configuration = config.Config()
         classname = configuration.get_value("Security", "authenticationProvider",
                                             "LocalUserAuthenticationProvider")
@@ -24,6 +49,9 @@ class AuthenticationProvider(object):
         return classobj()
 
 class HybridLocalLdapAuthenticationProvider(AuthenticationProvider):
+    """Hybrid Authentication
+    Tries at first local authentication, after that, LDAP autentication
+    """
 
     def authenticate(self, username, password):
         localAuthProvider = LocalUserAuthenticationProvider()
@@ -34,6 +62,7 @@ class HybridLocalLdapAuthenticationProvider(AuthenticationProvider):
         return ret_value
 
 class LocalUserAuthenticationProvider(AuthenticationProvider):
+    """Authentication against a local user database"""
 
     def authenticate(self, username, password):
         password_hash = self.__hash_password(password)
@@ -49,6 +78,16 @@ class LocalUserAuthenticationProvider(AuthenticationProvider):
         return False
 
     def create_user(self, username, password):
+        """creates a user in local user database
+
+        Args:
+            - username: name of the user
+            - password: password of the user
+
+        Returns:
+            True, if the user was created successfully
+            False, if not
+        """
         try:
             orm_session = model.Session()
             user = model.LocalUser(
@@ -63,6 +102,13 @@ class LocalUserAuthenticationProvider(AuthenticationProvider):
         return True
 
     def get_user(self, username):
+        """Returns the user object for the given username
+        Args:
+            - username: name of the user
+
+        Returns:
+            the user object or None, if the user was not found
+        """
         try:
             orm_session = model.Session()
             user = orm_session.query(model.LocalUser).\
@@ -74,6 +120,16 @@ class LocalUserAuthenticationProvider(AuthenticationProvider):
         return user
 
     def change_password(self, username, password):
+        """change password of the given user
+
+        Args:
+            - username: name of the user
+            - password: new password of the user
+
+        Returns:
+            True, if password change was successful
+            False, if not
+        """
         try:
             orm_session = model.Session()
             user = orm_session.query(model.LocalUser).\
@@ -87,6 +143,15 @@ class LocalUserAuthenticationProvider(AuthenticationProvider):
         return True
 
     def delete_user(self, username):
+        """Delete the given user
+
+        Args:
+            - username: name of the user
+
+        Returns:
+            True, if the user was deleted successfully
+            False, if not
+        """
         orm_session = model.Session()
         user = orm_session.query(model.LocalUser).\
                            filter(model.LocalUser.user_name==username).\
@@ -100,6 +165,7 @@ class LocalUserAuthenticationProvider(AuthenticationProvider):
             return True
 
     def list_users(self):
+        """Returns a list with all users"""
         orm_session = model.Session()
         users = orm_session.query(model.LocalUser).all()
         orm_session.close()
@@ -112,6 +178,7 @@ class LocalUserAuthenticationProvider(AuthenticationProvider):
 
 
 class LdapAuthenticationProvider(AuthenticationProvider):
+    """Authentication against LDAP"""
 
     def authenticate(self, username, password):
         # get configuration options
