@@ -28,16 +28,16 @@ from webapp.json_helper import json_check
 from webapp.json_helper import json_result
 from webapp.json_helper import json_error
 
-app = Flask("opennms_alarmforwarder")
 
-@app.before_first_request
 def app_init():
+    """Flask app init"""
     config = Config()
     basedir = os.path.dirname(os.path.abspath(__file__))
-    app.root_path = basedir
-    app.secret_key = config.get_value("Webserver", "secret", "notsosecretkey")
-
-
+    flask_app = Flask("opennms_alarmforwarder")
+    flask_app.root_path = basedir
+    flask_app.secret_key = config.get_value("Webserver", "secret", "notsosecretkey")
+    return flask_app
+app = app_init()
 
 
 @app.route("/")
