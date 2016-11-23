@@ -214,9 +214,14 @@ class LdapAuthenticationProvider(AuthenticationProvider):
         for entry in ldap_connection.entries:
             # try to bind with user dn
             try:
-                result = ldap_connection_test = ldap3.Connection(ldap_server_pool, entry.entry_get_dn(),
+                try:
+                    entry_dn = entry.entry_dn
+                except:
+                    entry_dn = entry.entry_get_dn()
+                result = ldap_connection_test = ldap3.Connection(ldap_server_pool, entry_dn,
                                                                  password, auto_bind=True)
-            except:
+            except Exception as e:
+                self._logger.debug("LdapAuthenticationProvider: Could not bind. Exception: %s", e)
                 result = False
             if result:
                 self._logger.info("LdapAuthenticationProvider: Login of user %s successful", username)
