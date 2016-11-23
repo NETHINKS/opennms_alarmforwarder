@@ -500,6 +500,8 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_setup">Setup</a>
 <ul class="sectlevel2">
 <li><a href="#_manually_setup_your_environment">Manually setup your environment</a></li>
+<li><a href="#_setup_for_centos_7">Setup for Centos 7</a></li>
+<li><a href="#_setup_for_ubuntu_16">Setup for Ubuntu 16</a></li>
 <li><a href="#_start_a_docker_container">Start a Docker Container</a></li>
 </ul>
 </li>
@@ -532,7 +534,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <h2 id="_introduction">Introduction</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>OpenNMS AlarmForwarder is a small tool written in Python for doing notifications on OpenNMS alarms. In a configurable interval, alarms were read from one or multiple OpenNMS servers (using the OpenNMS REST API) and saved in a local database. You can define multiple targets for notifications (e.g. mail, SMS, OTRS ticket) and forwarding rules. The forwarding of alarms can be delayed and suppressed, if the alarm is resolved within this interval. A daemon handles the alarm forwarding and most of the configuration is done in a small WebUI (with REST API).</p>
+<p>OpenNMS AlarmForwarder is a small tool written in Python3 for doing notifications on OpenNMS alarms. In a configurable interval, alarms were read from one or multiple OpenNMS servers (using the OpenNMS REST API) and saved in a local database. You can define multiple targets for notifications (e.g. mail, SMS, OTRS ticket) and forwarding rules. The forwarding of alarms can be delayed and suppressed, if the alarm is resolved within this interval. A daemon handles the alarm forwarding and most of the configuration is done in a small WebUI (with REST API).</p>
 </div>
 </div>
 </div>
@@ -590,9 +592,188 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </div>
 </div>
 <div class="sect2">
+<h3 id="_setup_for_centos_7">Setup for Centos 7</h3>
+<div class="sect3">
+<h4 id="_install_the_required_software">Install the required software</h4>
+<div class="paragraph">
+<p>At first, Python3 and PostgreSQL must be installed. As Centos 7 does not bring Python 3 by default, you need to install it for example using the IUS Repository:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight"><code data-lang="bash">yum -y install https://centos7.iuscommunity.org/ius-release.rpm
+yum install python35u.x86_64 python35u-pip.noarch python35u-devel.x86_64 postgresql-server.x86_64 postgresql.x86_64 postgresql-devel.x86_64 gcc</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Use pip3.5 to install the required libraries:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight"><code data-lang="bash">pip3.5 install requests ldap3 gunicorn flask sqlalchemy psycopg2</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Create a symlink for Python3:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight"><code data-lang="bash">ln -s /usr/bin/python3.5 /usr/bin/python3</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_configure_postgresql">Configure PostgreSQL</h4>
+<div class="paragraph">
+<p>At first, the PostgreSQL database server must be initialized:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight"><code data-lang="bash">postgresql-setup initdb
+systemctl <span class="tok-nb">enable</span> postgresql
+systemctl start postgresql</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Now you can create a new user (e.g. <em>alarmforwarder</em>) and database (e.g. <em>alarmforwarder</em>) for PostgreSQL:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight"><code data-lang="bash">su postgres
+createuser -P alarmforwarder
+createdb -O alarmforwarder alarmforwarder
+<span class="tok-nb">exit</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>In the configuration file <em>/var/lib/pgsql/data/pg_hba.conf</em> the authentication methods were configured. Please change <em>ident</em> to <em>md5</em> here for the sources <em>127.0.0.1/32</em> and <em>::1/128</em></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight"><code># TYPE  DATABASE        USER            ADDRESS                 METHOD
+
+# "local" is for Unix domain socket connections only
+local   all             all                                     peer
+# IPv4 local connections:
+host    all             all             127.0.0.1/32            md5
+# IPv6 local connections:
+host    all             all             ::1/128                 md5</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>After the change, you need to reload PostgreSQL:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight"><code data-lang="bash">systemctl reload postgresql</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_install_alarmforwarder">Install AlarmForwarder</h4>
+<div class="paragraph">
+<p>Now you can install AlarmForwarder. Please extract the downloaded archive to <em>/opt/opennms_alarmforwarder</em>.</p>
+</div>
+<div class="paragraph">
+<p>Edit the /opt/opennms_alarmforwarder/etc/alarmforwarder.conf file and fill in the parameters of your database connection:</p>
+</div>
+<div class="listingblock">
+<div class="title">alarmforwarder.conf</div>
+<div class="content">
+<pre class="pygments highlight"><code data-lang="ini"><span class="tok-k">[DatabaseConnection]</span>
+<span class="tok-na">url</span> <span class="tok-o">=</span> <span class="tok-s">postgresql://alarmforwarder:alarmforwarder@localhost/alarmforwarder</span>
+
+<span class="tok-k">[...]</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Now you can execute the install script:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight"><code data-lang="bash">/opt/opennms_alarmforwarder/install.py</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Copy the systemd start script from the <em>contrib</em> directory and start AlarmForwarder:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight"><code data-lang="bash">cp /opt/opennms_alarmforwarder/contrib/startscripts/systemd/alarmforwarder.service /etc/systemd/system/
+systemctl <span class="tok-nb">enable</span> alarmforwarder.service
+systemctl start alarmforwarder.service</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_setup_for_ubuntu_16">Setup for Ubuntu 16</h3>
+<div class="sect3">
+<h4 id="_install_the_required_software_2">Install the required software</h4>
+<div class="paragraph">
+<p>At first all the required software, like <em>pip</em> and the PostgreSQL database server needs to be installed. The required Python libraries can be installed using <em>pip</em>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight"><code data-lang="bash">apt install python3-pip postgresql postgresql-server-dev-all
+pip3 install requests ldap3 gunicorn flask sqlalchemy psycopg2</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_configure_postgresql_2">Configure PostgreSQL</h4>
+<div class="paragraph">
+<p>Now you can create a new user (e.g. <em>alarmforwarder</em>) and database (e.g. <em>alarmforwarder</em>) for PostgreSQL:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight"><code data-lang="bash">su postgres
+createuser -P alarmforwarder
+createdb -O alarmforwarder alarmforwarder
+<span class="tok-nb">exit</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_install_alarmforwarder_2">Install AlarmForwarder</h4>
+<div class="paragraph">
+<p>Now you can install AlarmForwarder. Please extract the downloaded archive to <em>/opt/opennms_alarmforwarder</em>.</p>
+</div>
+<div class="paragraph">
+<p>Edit the /opt/opennms_alarmforwarder/etc/alarmforwarder.conf file and fill in the parameters of your database connection:</p>
+</div>
+<div class="listingblock">
+<div class="title">alarmforwarder.conf</div>
+<div class="content">
+<pre class="pygments highlight"><code data-lang="ini"><span class="tok-k">[DatabaseConnection]</span>
+<span class="tok-na">url</span> <span class="tok-o">=</span> <span class="tok-s">postgresql://alarmforwarder:alarmforwarder@localhost/alarmforwarder</span>
+
+<span class="tok-k">[...]</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Now you can execute the install script:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight"><code data-lang="bash">/opt/opennms_alarmforwarder/install.py</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Copy the systemd start script from the <em>contrib</em> directory and start AlarmForwarder:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight"><code data-lang="bash">cp /opt/opennms_alarmforwarder/contrib/startscripts/systemd/alarmforwarder.service /etc/systemd/system/
+systemctl <span class="tok-nb">enable</span> alarmforwarder.service
+systemctl start alarmforwarder.service</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
 <h3 id="_start_a_docker_container">Start a Docker Container</h3>
 <div class="paragraph">
-<p>There is a Docker Image for AlarmForwarder on Docker Hub. It will need a PostgreSQL database. You can use the following docker-compse.yml file:</p>
+<p>There is also a Docker Image for AlarmForwarder on Docker Hub. It will need a PostgreSQL database. You can use the following docker-compse.yml file:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -715,7 +896,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <dl>
 <dt class="hdlist1"><strong>authenticationProvider</strong></dt>
 <dd>
-<p>The authentication mechanism that is used for the WebUI. At the moment the following providers are available: <em>LocalUserAuthenticationProvider</em>, <em>LdapAuthenticationProvider</em>.</p>
+<p>The authentication mechanism that is used for the WebUI. At the moment the following providers are available: <em>LocalUserAuthenticationProvider</em>, <em>LdapAuthenticationProvider</em>, <em>HybridLocalLdapProvider</em>.</p>
 </dd>
 </dl>
 </div>
@@ -1277,7 +1458,7 @@ example: alarm_uei~.*nodeDown.*</code></pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-11-20 15:21:00 CET
+Last updated 2016-11-23 15:25:55 CET
 </div>
 </div>
 </body>
