@@ -6,7 +6,7 @@
                                 <span class="glyphicon glyphicon-plus"></span>Add Rule
                             </a>
     </li>
-    <li role="presentation"><a href="/docs#_forwarding_rules" target="_blank">
+    <li role="presentation"><a href="{{ baseurl }}/docs#_forwarding_rules" target="_blank">
                                 <span class="glyphicon glyphicon-question-sign"></span>Help
                             </a>
     </li>
@@ -22,7 +22,7 @@
             </div>
 
             <div class="modal-body">
-                <form method="POST" action="/rules/add">
+                <form method="POST" action="{{ baseurl }}/rules/add">
                     <div class="form-group">
                         <label for="inputRule">Rule</label>
                         <input type="text" class="form-control" id="inputRule" name="rule" placeholder="alarm_uei~.*nodeDown.*">
@@ -67,8 +67,8 @@
                 <td>{{ rule.rule_maxforwardings }}</td>
                 <td>{{ rule.rule_target }}</td>
                 <td>
-                    <a href="/rules/{{ rule.rule_id }}" title="edit rule"><span class="glyphicon glyphicon-edit"></span></a>
-                    <a href="/rules/{{ rule.rule_id }}/delete" title="delete rule"><span class="glyphicon glyphicon-remove"></span></a>
+                    <a href="{{ baseurl }}/rules/{{ rule.rule_id }}" title="edit rule"><span class="glyphicon glyphicon-edit"></span></a>
+                    <a href="{{ baseurl }}/rules/{{ rule.rule_id }}/delete" title="delete rule"><span class="glyphicon glyphicon-remove"></span></a>
                 </td>
             </tr>
         {% endfor %}

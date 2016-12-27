@@ -3,9 +3,9 @@
 <!-- page navigation -->
 <ul class="nav nav-pills">
     <li role="presentation">
-        <a href="/sources"><span class="glyphicon glyphicon-list"></span>List Sources</a>
+        <a href="{{ baseurl }}/sources"><span class="glyphicon glyphicon-list"></span>List Sources</a>
     </li>
-    <li role="presentation"><a href="/docs#_sources" target="_blank">
+    <li role="presentation"><a href="{{ baseurl }}/docs#_sources" target="_blank">
                                 <span class="glyphicon glyphicon-question-sign"></span>Help
                             </a>
     </li>
@@ -15,7 +15,7 @@
 <h1><span class="glyphicon glyphicon-log-in"></span>Source {{ source.source_name }}</h1>
 
 <div class="container">
-    <form method="POST" action="/sources/{{ source.source_name }}/edit">
+    <form method="POST" action="{{ baseurl }}/sources/{{ source.source_name }}/edit">
         <div class="form-group">
             <label for="inputUrl">URL</label>
             <input type="text" class="form-control" id="inputUrl" name="url" value="{{ source.source_url }}" />

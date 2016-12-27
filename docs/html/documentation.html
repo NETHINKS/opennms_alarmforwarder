@@ -832,6 +832,7 @@ systemctl start alarmforwarder.service</code></pre>
 <span class="tok-k">[Webserver]</span>
 <span class="tok-na">bind</span> <span class="tok-o">=</span> <span class="tok-s">0.0.0.0:5000</span>
 <span class="tok-na">workers</span> <span class="tok-o">=</span> <span class="tok-s">2</span>
+<span class="tok-c1">;baseurl = http://%%host%%/alarmforwarder</span>
 
 <span class="tok-k">[Scheduler]</span>
 <span class="tok-na">queryInterval</span> <span class="tok-o">=</span> <span class="tok-s">30</span>
@@ -875,6 +876,10 @@ systemctl start alarmforwarder.service</code></pre>
 <dt class="hdlist1"><strong>workers</strong></dt>
 <dd>
 <p>Number of worker processes.</p>
+</dd>
+<dt class="hdlist1"><strong>baseurl</strong></dt>
+<dd>
+<p>This string can be set to define the base URL of the WebUI. This setting is interesting if you use AlarmForwarder behind an HTTP proxy server. You can use %%host%% as variable.</p>
 </dd>
 </dl>
 </div>
@@ -1458,7 +1463,7 @@ example: alarm_uei~.*nodeDown.*</code></pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-11-23 15:25:55 CET
+Last updated 2016-12-27 16:40:49 CET
 </div>
 </div>
 </body>

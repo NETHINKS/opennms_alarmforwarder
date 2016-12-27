@@ -14,7 +14,6 @@ from flask import jsonify
 from flask import send_from_directory
 from flask import render_template
 from flask import request
-from flask import redirect
 from flask import session
 from flask import url_for
 from sqlalchemy.orm import joinedload
@@ -27,6 +26,8 @@ from webapp.auth import AuthenticationHandler
 from webapp.json_helper import json_check
 from webapp.json_helper import json_result
 from webapp.json_helper import json_error
+from webapp.flask_helper import get_baseurl
+from webapp.flask_helper import redirect
 
 
 def app_init():
@@ -38,6 +39,14 @@ def app_init():
     flask_app.secret_key = config.get_value("Webserver", "secret", "notsosecretkey")
     return flask_app
 app = app_init()
+
+@app.context_processor
+def inject_template_vars():
+    config = Config()
+    output = {}
+    output["baseurl"] = get_baseurl()
+    return output
+
 
 
 @app.route("/")

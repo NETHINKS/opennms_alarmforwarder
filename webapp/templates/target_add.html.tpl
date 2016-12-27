@@ -3,7 +3,7 @@
 <h1>Add new target</h1>
 
 <div class="container">
-    <form method="POST" action="/targets/add">
+    <form method="POST" action="{{ baseurl }}/targets/add">
         <input type="hidden" name="action" value="add">
         <div class="form-group">
             <label for="inputName">Name</label>

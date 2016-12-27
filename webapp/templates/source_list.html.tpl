@@ -6,7 +6,7 @@
                                 <span class="glyphicon glyphicon-plus"></span>Add Source
                             </a>
     </li>
-    <li role="presentation"><a href="/docs#_sources" target="_blank">
+    <li role="presentation"><a href="{{ baseurl }}/docs#_sources" target="_blank">
                                 <span class="glyphicon glyphicon-question-sign"></span>Help
                             </a>
     </li>
@@ -24,7 +24,7 @@
             </div>
 
             <div class="modal-body">
-                <form method="POST" action="/sources/add">
+                <form method="POST" action="{{ baseurl }}/sources/add">
                     <div class="form-group">
                         <label for="inputName">Name</label>
                         <input type="text" class="form-control" id="inputName" name="name" placeholder="Name">
@@ -82,9 +82,9 @@
                     <td>{{ source.source_user }}</td>
                     <td>{{ source.source_filter }}</td>
                     <td>
-                        <a href="/sources/{{ source.source_name }}/test" title="test source"><span class="glyphicon glyphicon-ok"></span></a>
-                        <a href="/sources/{{ source.source_name }}" title="edit source"><span class="glyphicon glyphicon-edit"></span></a>
-                        <a href="/sources/{{ source.source_name }}/delete" title="delete source"><span class="glyphicon glyphicon-remove"></span></a>
+                        <a href="{{ baseurl }}/sources/{{ source.source_name }}/test" title="test source"><span class="glyphicon glyphicon-ok"></span></a>
+                        <a href="{{ baseurl }}/sources/{{ source.source_name }}" title="edit source"><span class="glyphicon glyphicon-edit"></span></a>
+                        <a href="{{ baseurl }}/sources/{{ source.source_name }}/delete" title="delete source"><span class="glyphicon glyphicon-remove"></span></a>
                     </td>
                 </tr>
         {% endfor %}

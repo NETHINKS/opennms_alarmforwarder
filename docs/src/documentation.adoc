@@ -229,6 +229,7 @@ url = postgresql://alarmforwarder:alarmforwarder@localhost/alarmforwarder
 [Webserver]
 bind = 0.0.0.0:5000
 workers = 2
+;baseurl = http://%%host%%/alarmforwarder
 
 [Scheduler]
 queryInterval = 30
@@ -261,6 +262,8 @@ This section configures the integrated webserver.
 *workers*::
   Number of worker processes.
 
+*baseurl*::
+  This string can be set to define the base URL of the WebUI. This setting is interesting if you use AlarmForwarder behind an HTTP proxy server. You can use %%host%% as variable.
 
 ==== [Scheduler]
 

@@ -82,7 +82,7 @@ h1 span.glyphicon, h2 span.glyphicon
 {
     min-height:         100%;
     min-width:          100%;
-    background:         url("/static/images/background.jpg") no-repeat;
+    background:         url("../images/background.jpg") no-repeat;
     background-size:    cover;
 }
 

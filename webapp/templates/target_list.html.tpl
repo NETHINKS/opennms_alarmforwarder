@@ -6,7 +6,7 @@
                                 <span class="glyphicon glyphicon-plus"></span>Add Target
                             </a>
     </li>
-    <li role="presentation"><a href="/docs#_targets" target="_blank">
+    <li role="presentation"><a href="{{ baseurl }}/docs#_targets" target="_blank">
                                 <span class="glyphicon glyphicon-question-sign"></span>Help
                             </a>
     </li>
@@ -25,7 +25,7 @@
             </div>
 
             <div class="modal-body">
-                <form method="POST" action="/targets/add">
+                <form method="POST" action="{{ baseurl }}/targets/add">
                     <input type="hidden" name="action" value="show_form">
                     <div class="form-group">
                         <label for="inputName">Target Name</label>
@@ -60,9 +60,9 @@
                 <td>{{ target.target_name }}</td>
                 <td>{{ target.target_class }}</td>
                 <td>
-                    <a href="/targets/{{ target.target_name }}/test" title="test target"><span class="glyphicon glyphicon-ok"></span></a>
-                    <a href="/targets/{{ target.target_name }}" title="edit target"><span class="glyphicon glyphicon-edit"></span></a>
-                    <a href="/targets/{{ target.target_name }}/delete" title="delete target"><span class="glyphicon glyphicon-remove"></span></a>
+                    <a href="{{ baseurl }}/targets/{{ target.target_name }}/test" title="test target"><span class="glyphicon glyphicon-ok"></span></a>
+                    <a href="{{ baseurl }}/targets/{{ target.target_name }}" title="edit target"><span class="glyphicon glyphicon-edit"></span></a>
+                    <a href="{{ baseurl }}/targets/{{ target.target_name }}/delete" title="delete target"><span class="glyphicon glyphicon-remove"></span></a>
                 </td>
             </tr>
         {% endfor %}

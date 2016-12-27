@@ -3,9 +3,9 @@
 <!-- page navigation -->
 <ul class="nav nav-pills">
     <li role="presentation">
-        <a href="/targets"><span class="glyphicon glyphicon-list"></span>List Targets</a>
+        <a href="{{ baseurl }}/targets"><span class="glyphicon glyphicon-list"></span>List Targets</a>
     </li>
-    <li role="presentation"><a href="/docs#_targets" target="_blank">
+    <li role="presentation"><a href="{{ baseurl }}/docs#_targets" target="_blank">
                                 <span class="glyphicon glyphicon-question-sign"></span>Help
                             </a>
     </li>
@@ -14,7 +14,7 @@
 <h1><span class="glyphicon glyphicon-log-out"></span>Target {{ target.target_name }}</h1>
 
 <div class="container">
-    <form method="POST" action="/targets/{{ target.target_name }}/edit">
+    <form method="POST" action="{{ baseurl }}/targets/{{ target.target_name }}/edit">
         <div class="form-group">
             <label for="inputClass">Class</label>
             <input type="text" class="form-control" id="inputClass" name="class" value="{{ target.target_class }}" disabled="disabled" />

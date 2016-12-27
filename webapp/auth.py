@@ -7,12 +7,12 @@ This module defines authentication for the webapp
 :copyright: (c) 2016 by NETHINKS GmbH, see AUTORS for more details
 """
 from functools import wraps
-from flask import redirect
 from flask import request
 from flask import session
 from webapp.json_helper import json_check
 from webapp.json_helper import json_result
 from webapp.json_helper import json_error
+from webapp.flask_helper import redirect
 import security
 
 class AuthenticationHandler(object):

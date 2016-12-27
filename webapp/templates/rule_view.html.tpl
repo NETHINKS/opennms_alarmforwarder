@@ -3,9 +3,9 @@
 <!-- page navigation -->
 <ul class="nav nav-pills">
     <li role="presentation">
-        <a href="/rules"><span class="glyphicon glyphicon-list"></span>List Forwarding Rules</a>
+        <a href="{{ baseurl }}/rules"><span class="glyphicon glyphicon-list"></span>List Forwarding Rules</a>
     </li>
-    <li role="presentation"><a href="/docs#_forwarding_rules" target="_blank">
+    <li role="presentation"><a href="{{ baseurl }}/docs#_forwarding_rules" target="_blank">
                                 <span class="glyphicon glyphicon-question-sign"></span>Help
                             </a>
     </li>
@@ -14,7 +14,7 @@
 <h1><span class="glyphicon glyphicon-random"></span>Rule {{ rule.rule_id }}</h1>
 
 <div class="container">
-    <form method="POST" action="/rules/{{ rule.rule_id }}/edit">
+    <form method="POST" action="{{ baseurl }}/rules/{{ rule.rule_id }}/edit">
         <div class="form-group">
             <label for="inputMatch">Rule</label>
             <input type="text" class="form-control" id="inputMatch" name="match" value="{{ rule.rule_match }}" />

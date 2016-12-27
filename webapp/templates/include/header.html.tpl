@@ -6,15 +6,15 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
         <!-- CSS -->
-        <link href="/static/css/bootstrap.min.css" rel="stylesheet">
-        <link href="/static/css/alarmforwarder.css" rel="stylesheet">
+        <link href="{{ baseurl }}/static/css/bootstrap.min.css" rel="stylesheet">
+        <link href="{{ baseurl }}/static/css/alarmforwarder.css" rel="stylesheet">
 
         <!-- JavaScript -->
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-        <script src="/static/js/bootstrap.min.js"></script>
+        <script src="{{ baseurl }}/static/js/bootstrap.min.js"></script>
 
         <!-- Favicon -->
-        <link rel="shortcut icon" type="image/x-icon" href="/static/images/favicon.ico" />
+        <link rel="shortcut icon" type="image/x-icon" href="{{ baseurl }}/static/images/favicon.ico" />
 
         <title>OpenNMS AlarmForwarder Admin</title>
     </head>

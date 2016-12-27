@@ -3,14 +3,14 @@
 <!-- page navigation -->
 <ul class="nav nav-pills">
     <li role="presentation">
-        <a href="/admin/users"><span class="glyphicon glyphicon-list"></span>List Users</a>
+        <a href="{{ baseurl }}/admin/users"><span class="glyphicon glyphicon-list"></span>List Users</a>
     </li>
 </ul>
 
 <h1><span class="glyphicon glyphicon-user"></span>User {{ user.user_name }}</h1>
 
 <div class="container">
-    <form method="POST" action="/admin/users/{{ user.user_name }}/edit">
+    <form method="POST" action="{{ baseurl }}/admin/users/{{ user.user_name }}/edit">
         <div class="form-group">
             <label for="inputName">Name</label>
             <input type="text" class="form-control" id="inputName" name="name" value="{{ user.user_name }}" disabled="disabled" />

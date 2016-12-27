@@ -21,7 +21,7 @@
             </div>
 
             <div class="modal-body">
-                <form method="POST" action="/admin/users/add">
+                <form method="POST" action="{{ baseurl }}/admin/users/add">
                     <div class="form-group">
                         <label for="inputName">Username</label>
                         <input type="text" class="form-control" id="inputName" name="name" placeholder="Name">
@@ -50,8 +50,8 @@
                 <tr>
                     <td>{{ user.user_name }}</td>
                     <td>
-                        <a href="/admin/users/{{ user.user_name }}" title="edit user"><span class="glyphicon glyphicon-edit"></span></a>
-                        <a href="/admin/users/{{ user.user_name }}/delete" title="delete user"><span class="glyphicon glyphicon-remove"></span></a>
+                        <a href="{{ baseurl }}/admin/users/{{ user.user_name }}" title="edit user"><span class="glyphicon glyphicon-edit"></span></a>
+                        <a href="{{ baseurl }}/admin/users/{{ user.user_name }}/delete" title="delete user"><span class="glyphicon glyphicon-remove"></span></a>
                     </td>
                 </tr>
         {% endfor %}
