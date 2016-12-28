@@ -98,14 +98,15 @@ def get_password_change():
     # check, if data are form data or json
     if request.get_json(silent=True) is not None:
         # add source from json data
-        password_old = request.json["password-old"]
-        password_new = request.json["password-new"]
-        password_new2 = request.json["password-new2"]
+        username = request.authorization.username
+        password_old = request.json["password_old"]
+        password_new = request.json["password_new"]
+        password_new2 = request.json["password_new2"]
     else:
+        username = session["username"]
         password_old = request.form["password-old"]
         password_new = request.form["password-new"]
         password_new2 = request.form["password-new2"]
-    username = session["username"]
     # check authentication
     local_auth_provider = security.LocalUserAuthenticationProvider()
     if not local_auth_provider.authenticate(username, password_old):
