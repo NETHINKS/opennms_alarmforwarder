@@ -1,15 +1,14 @@
 {% include 'include/header.html.tpl' %}
 
 <!-- page navigation -->
-<ul class="nav nav-pills">
+<ul class="breadcrumb pull-right">
     <li role="presentation"><a href="#" data-toggle="modal" data-target="#modalAddUser">
-                                <span class="glyphicon glyphicon-plus"></span>Add User
+                                <i class="fa fa-plus-circle" aria-hidden="true"></i> Add User
                             </a>
     </li>
 </ul>
 
 
-<h1><span class="glyphicon glyphicon-user"></span>Local Users</h1>
 
 <!-- modal: add new user -->
 <div class="modal fade" id="modalAddUser" tabindex="-1" role="dialog">
@@ -28,9 +27,10 @@
                     </div>
                     <div class="form-group">
                         <label for="inputPassword">Password</label>
-                        <input type="password" class="form-control" id="inputPassword" name="password" placeholder="secret1234">
+                        <input type="password" data-toggle="password" class="form-control" id="inputPassword" name="password" placeholder="secret1234">
                     </div>
                     <button type="submit" class="btn btn-primary">Submit</button>
+                    <button type="reset" class="btn btn-default">Reset</button>
                 </form>
             </div>
         </div>
@@ -38,9 +38,9 @@
 </div>
 
 
+<h1 class="page-header"><i class="fa fa-user" aria-hidden="true"></i> Local Users</h1>
 <!-- table with all users -->
-<div class="container">
-    <table class="table table-default">
+    <table class="table table-default table-striped table-hover">
         <tr>
                 <th>Username</th>
                 <th>Action</th>
@@ -50,13 +50,12 @@
                 <tr>
                     <td>{{ user.user_name }}</td>
                     <td>
-                        <a href="{{ baseurl }}/admin/users/{{ user.user_name }}" title="edit user"><span class="glyphicon glyphicon-edit"></span></a>
-                        <a href="{{ baseurl }}/admin/users/{{ user.user_name }}/delete" title="delete user"><span class="glyphicon glyphicon-remove"></span></a>
+                        <a href="{{ baseurl }}/admin/users/{{ user.user_name }}" title="edit user"><i class="fa fa-pencil-square" aria-hidden="true"></i></a>
+                        <a href="{{ baseurl }}/admin/users/{{ user.user_name }}delete" title="delete user"><i class="fa fa-times" aria-hidden="true"></i></a>
                     </td>
                 </tr>
         {% endfor %}
 
     </table>
-</div>
 
 {% include 'include/footer.html.tpl' %}

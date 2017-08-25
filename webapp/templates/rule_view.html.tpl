@@ -1,19 +1,18 @@
 {% include 'include/header.html.tpl' %}
 
 <!-- page navigation -->
-<ul class="nav nav-pills">
+<ul class="breadcrumb pull-right">
     <li role="presentation">
-        <a href="{{ baseurl }}/rules"><span class="glyphicon glyphicon-list"></span>List Forwarding Rules</a>
+        <a href="{{ baseurl }}/rules"><i class="fa fa-list" aria-hidden="true"></i> List Forwarding Rules</a>
     </li>
     <li role="presentation"><a href="{{ baseurl }}/docs#_forwarding_rules" target="_blank">
-                                <span class="glyphicon glyphicon-question-sign"></span>Help
+                                <i class="fa fa-question-circle" aria-hidden="true"></i> Help
                             </a>
     </li>
 </ul>
 
-<h1><span class="glyphicon glyphicon-random"></span>Rule {{ rule.rule_id }}</h1>
+<h1 class="page-header"><i class="fa fa-random" aria-hidden="true"></i> Rule: {{ rule.rule_id }}</h1>
 
-<div class="container">
     <form method="POST" action="{{ baseurl }}/rules/{{ rule.rule_id }}/edit">
         <div class="form-group">
             <label for="inputMatch">Rule</label>
@@ -36,7 +35,7 @@
             </select>
         </div>
         <button type="submit" class="btn btn-primary">Save</button>
+        <button type="reset" class="btn btn-default">Reset</button>
     </form>
-</div>
 
 {% include 'include/footer.html.tpl' %}

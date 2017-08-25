@@ -15,7 +15,8 @@ from flask import send_from_directory
 from flask import render_template
 from flask import request
 from flask import session
-from flask import url_for
+
+from werkzeug.http import http_date
 from sqlalchemy.orm import joinedload
 import model
 import forwarder
@@ -28,6 +29,7 @@ from webapp.json_helper import json_result
 from webapp.json_helper import json_error
 from webapp.flask_helper import get_baseurl
 from webapp.flask_helper import redirect
+from datetime import datetime
 
 
 def app_init():
@@ -40,13 +42,14 @@ def app_init():
     return flask_app
 app = app_init()
 
+
 @app.context_processor
 def inject_template_vars():
-    config = Config()
     output = {}
     output["baseurl"] = get_baseurl()
+    current_path = str(request.url_rule)[1:].split("/")
+    output["current_path"] = current_path[0]
     return output
-
 
 
 @app.route("/")
@@ -58,12 +61,14 @@ def index():
     orm_session.close()
     return render_template("index.html.tpl", sources=sources, rules=rules)
 
+
 @app.route("/docs")
 def documentation():
     basedir = os.path.dirname(os.path.abspath(__file__))
     docs_dir = basedir + "/../docs/html"
     docs_file = "documentation.html"
     return send_from_directory(docs_dir, docs_file)
+
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -83,11 +88,13 @@ def login():
             flash(error_msg, "alert-danger")
     return render_template("login.html.tpl")
 
+
 @app.route("/logout")
 @AuthenticationHandler.login_required
 def logout():
     AuthenticationHandler.logout()
     return redirect("/")
+
 
 @app.route("/password-change", methods=['GET', 'POST'])
 @AuthenticationHandler.login_required
@@ -131,7 +138,6 @@ def get_password_change():
     return redirect("/")
 
 
-
 @app.route("/admin/users")
 @AuthenticationHandler.login_required
 def get_user_list():
@@ -140,6 +146,7 @@ def get_user_list():
     if json_check():
         return jsonify(items=[user.dict_repr() for user in users])
     return render_template("user_list.html.tpl", users=users)
+
 
 @app.route("/admin/users/<name>")
 @AuthenticationHandler.login_required
@@ -155,6 +162,7 @@ def get_user(name):
     if json_check():
         return jsonify(user.diect_repr())
     return render_template("user_view.html.tpl", user=user)
+
 
 @app.route("/admin/users/add", methods=['POST'])
 @AuthenticationHandler.login_required
@@ -183,6 +191,7 @@ def add_user():
         flash(message, "alert-success")
     return redirect("/admin/users")
 
+
 @app.route("/admin/users/<name>/delete")
 @AuthenticationHandler.login_required
 def delete_user(name):
@@ -207,6 +216,7 @@ def delete_user(name):
         flash(message, "alert-success")
         return redirect("/admin/users")
 
+
 @app.route("/admin/users/<name>/edit", methods=['POST'])
 @AuthenticationHandler.login_required
 def edit_user(name):
@@ -230,7 +240,6 @@ def edit_user(name):
         return json_result(message, 200)
     flash(message, "alert-success")
     return redirect("/admin/users")
-
 
 
 @app.route("/sources")
@@ -258,6 +267,7 @@ def get_source(name):
     if json_check():
         return jsonify(source.dict_repr())
     return render_template("source_view.html.tpl", source=source)
+
 
 @app.route("/sources/<name>/test")
 @AuthenticationHandler.login_required
@@ -289,6 +299,7 @@ def test_source(name):
     if json_check():
         return jsonify(result)
     return redirect("/sources")
+
 
 @app.route("/sources/<name>/edit", methods=['POST'])
 @AuthenticationHandler.login_required
@@ -324,6 +335,7 @@ def edit_source(name):
             orm_session.close()
             flash("Source " + name + " successfully changed", "alert-success")
             return redirect("/sources")
+
 
 @app.route("/sources/add", methods=['POST'])
 @AuthenticationHandler.login_required
@@ -364,6 +376,7 @@ def add_source():
     flash(message, "alert-success")
     return redirect("/sources")
 
+
 @app.route("/sources/<name>/delete")
 @AuthenticationHandler.login_required
 def delete_source(name):
@@ -387,7 +400,6 @@ def delete_source(name):
         return redirect("/sources")
 
 
-
 @app.route("/targets")
 @AuthenticationHandler.login_required
 def get_target_list():
@@ -399,6 +411,7 @@ def get_target_list():
         return jsonify(items=[target.dict_repr() for target in targets])
     return render_template("target_list.html.tpl", targets=targets,
                            forwarder_classes=forwarder_classes)
+
 
 @app.route("/targets/<name>")
 @AuthenticationHandler.login_required
@@ -416,6 +429,7 @@ def get_target(name):
         if json_check():
             return jsonify(target.dict_repr())
         return render_template("target_view.html.tpl", target=target)
+
 
 @app.route("/targets/<name>/test", methods=["GET", "POST"])
 @AuthenticationHandler.login_required
@@ -445,8 +459,9 @@ def test_target(name):
         result_msg = "Target " + name + " tested"
         if json_check():
             return json_result(result_msg, 200)
-        flash(result_msg, "alert-info")
+        flash(result_msg, "alert-success")
         return redirect("/targets")
+
 
 @app.route("/targets/<name>/delete")
 @AuthenticationHandler.login_required
@@ -469,6 +484,7 @@ def delete_target(name):
             return json_result(result_msg, 200)
         flash(result_msg, "alert-success")
         return redirect("/targets")
+
 
 @app.route("/targets/add", methods=['POST'])
 @AuthenticationHandler.login_required
@@ -517,6 +533,7 @@ def add_target():
         flash(result_msg, "alert-success")
         return redirect("/targets")
 
+
 @app.route("/targets/<name>/edit", methods=['POST'])
 @AuthenticationHandler.login_required
 def edit_target(name):
@@ -554,8 +571,6 @@ def edit_target(name):
         return redirect("/targets")
 
 
-
-
 @app.route("/rules")
 @AuthenticationHandler.login_required
 def get_rule_list():
@@ -566,6 +581,7 @@ def get_rule_list():
     if json_check():
         return jsonify(items=[rule.dict_repr() for rule in rules])
     return render_template("rule_list.html.tpl", rules=rules,  targets=targets)
+
 
 @app.route("/rules/<rule_id>")
 @AuthenticationHandler.login_required
@@ -584,6 +600,7 @@ def get_rule(rule_id):
     if json_check():
         return jsonify(rule.dict_repr())
     return render_template("rule_view.html.tpl", rule=rule, targets=targets)
+
 
 @app.route("/rules/add", methods=['POST'])
 @AuthenticationHandler.login_required
@@ -610,6 +627,7 @@ def add_rule():
         return json_result(result_msg, 200)
     flash("Rule successfully added", "alert-success")
     return redirect("/rules")
+
 
 @app.route("/rules/<rule_id>/edit", methods=['POST'])
 @AuthenticationHandler.login_required
@@ -644,6 +662,7 @@ def edit_rule(rule_id):
         flash(result_msg, "alert-success")
         return redirect("/rules")
 
+
 @app.route("/rules/<rule_id>/delete")
 @AuthenticationHandler.login_required
 def delete_rule(rule_id):
@@ -667,3 +686,19 @@ def delete_rule(rule_id):
         flash(result_msg, "alert-success")
         return redirect("/rules")
 
+"""
+Add headers to both force latest IE rendering engine or Chrome Frame,
+and also to cache the rendered page for 10 minutes.
+see: https://stackoverflow.com/questions/34066804/disabling-caching-in-flask
+see: https://arusahni.net/blog/2014/03/flask-nocache.html
+"""
+
+
+@app.after_request
+def add_header(r):
+    r.headers['Last-Modified'] = http_date(datetime.now())
+    r.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    r.headers["Pragma"] = "no-cache"
+    r.headers["Expires"] = "0"
+    r.headers['Cache-Control'] = 'public, max-age=0'
+    return r

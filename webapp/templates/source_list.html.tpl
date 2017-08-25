@@ -1,17 +1,17 @@
 {% include 'include/header.html.tpl' %}
 
 <!-- page navigation -->
-<ul class="nav nav-pills">
-    <li role="presentation"><a href="#" data-toggle="modal" data-target="#modalAddSource">
-                                <span class="glyphicon glyphicon-plus"></span>Add Source
+<ul class="breadcrumb pull-right">
+    <li><a href="#" data-toggle="modal" data-target="#modalAddSource">
+                                <i class="fa fa-plus-circle" aria-hidden="true"></i> Add Source
                             </a>
     </li>
-    <li role="presentation"><a href="{{ baseurl }}/docs#_sources" target="_blank">
-                                <span class="glyphicon glyphicon-question-sign"></span>Help
-                            </a>
+    <li>
+        <a href="{{ baseurl }}/docs#_sources" target="_blank">
+            <i class="fa fa-question-circle" aria-hidden="true"></i> Help
+        </a>
     </li>
 </ul>
-
 
 
 <!-- modal: add new target -->
@@ -39,13 +39,14 @@
                     </div>
                     <div class="form-group">
                         <label for="inputPassword">Password</label>
-                        <input type="text" class="form-control" id="inputPassword" name="password" placeholder="admin">
+                        <input type="password" data-toggle="password" class="form-control" id="inputPassword" name="password" placeholder="admin">
                     </div>
                     <div class="form-group">
                         <label for="inputFilter">Filter</label>
                         <input type="text" class="form-control" id="inputFilter" name="filter" placeholder="alarmAckUser IS NULL AND stickyMemo is NULL AND severity &gt; CLEARED">
                     </div>
                     <button type="submit" class="btn btn-primary">Submit</button>
+                    <button type="reset" class="btn btn-default">Reset</button>
                 </form>
             </div>
         </div>
@@ -54,9 +55,8 @@
 
 
 <!-- table with all sources -->
-<div class="container">
-    <h1><span class="glyphicon glyphicon-log-in"></span>Sources</h1>
-    <table class="table table-default">
+    <h1 class="page-header"><i class="fa fa-sign-out" aria-hidden="true"></i> Sources</h1>
+    <table class="table table-default table-striped table-hover">
         <tr>
                 <th>Status</th>
                 <th>Name</th>
@@ -69,27 +69,26 @@
         {% for source in sources %}
             {% if source.source_status == 2 %}
                 <tr class="danger">
-                    <td><span class="glyphicon glyphicon-remove-sign"></span></td>
+                    <td><i class="fa fa-ban" aria-hidden="true"></i></td>
             {% elif source.source_status == 1 %}
                 <tr class="success">
-                    <td><span class="glyphicon glyphicon-ok-sign"></span></td>
+                    <td><i class="fa fa-check-circle" aria-hidden="true"></i></td>
             {% else %}
                 <tr>
-                    <td><span class="glyphicon glyphicon-question-sign"></span></td>
+                    <td><i class="fa fa-question-circle" aria-hidden="true"></i></td>
             {% endif %}
                     <td>{{ source.source_name }}</td>
-                    <td>{{ source.source_url }}</td>
+                    <td><a href="{{ source.source_url }}" target="_blank">{{ source.source_url }}</a></td>
                     <td>{{ source.source_user }}</td>
                     <td>{{ source.source_filter }}</td>
                     <td>
-                        <a href="{{ baseurl }}/sources/{{ source.source_name }}/test" title="test source"><span class="glyphicon glyphicon-ok"></span></a>
-                        <a href="{{ baseurl }}/sources/{{ source.source_name }}" title="edit source"><span class="glyphicon glyphicon-edit"></span></a>
-                        <a href="{{ baseurl }}/sources/{{ source.source_name }}/delete" title="delete source"><span class="glyphicon glyphicon-remove"></span></a>
+                        <a href="{{ baseurl }}/sources/{{ source.source_name }}/test" title="test source"><i class="fa fa-check-square" aria-hidden="true"></i></a>
+                        <a href="{{ baseurl }}/sources/{{ source.source_name }}" title="edit source"><i class="fa fa-pencil-square" aria-hidden="true"></i></a>
+                        <a href="{{ baseurl }}/sources/{{ source.source_name }}/delete" title="delete source"><i class="fa fa-times" aria-hidden="true"></i></a>
                     </td>
                 </tr>
         {% endfor %}
 
     </table>
-</div>
 
 {% include 'include/footer.html.tpl' %}

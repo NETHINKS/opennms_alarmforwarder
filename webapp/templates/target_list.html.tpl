@@ -1,19 +1,19 @@
 {% include 'include/header.html.tpl' %}
 
 <!-- page navigation -->
-<ul class="nav nav-pills">
+<ul class="breadcrumb pull-right">
     <li role="presentation"><a href="#" data-toggle="modal" data-target="#modalAddTarget">
-                                <span class="glyphicon glyphicon-plus"></span>Add Target
+                                <i class="fa fa-plus-circle" aria-hidden="true"></i> Add Target
                             </a>
     </li>
     <li role="presentation"><a href="{{ baseurl }}/docs#_targets" target="_blank">
-                                <span class="glyphicon glyphicon-question-sign"></span>Help
+                                <i class="fa fa-question-circle" aria-hidden="true"></i> Help
                             </a>
     </li>
 </ul>
 
 
-<h1><span class="glyphicon glyphicon-log-out"></span>Targets</h1>
+<h1 class="page-header"><i class="fa fa-sign-in" aria-hidden="true"></i> Targets</h1>
 
 <!-- modal: add new target -->
 <div class="modal fade" id="modalAddTarget" tabindex="-1" role="dialog">
@@ -40,6 +40,7 @@
                         </select>
                     </div>
                     <button type="submit" class="btn btn-primary">Submit</button>
+                    <button type="reset" class="btn btn-default">Reset</button>
                 </form>
             </div>
         </div>
@@ -48,8 +49,7 @@
 
 
 <!-- table with all targets -->
-<div class="container">
-    <table class="table table-default">
+    <table class="table table-default table-striped table-hover">
         <tr>
                 <th>Name</th>
                 <th>Class</th>
@@ -60,14 +60,13 @@
                 <td>{{ target.target_name }}</td>
                 <td>{{ target.target_class }}</td>
                 <td>
-                    <a href="{{ baseurl }}/targets/{{ target.target_name }}/test" title="test target"><span class="glyphicon glyphicon-ok"></span></a>
-                    <a href="{{ baseurl }}/targets/{{ target.target_name }}" title="edit target"><span class="glyphicon glyphicon-edit"></span></a>
-                    <a href="{{ baseurl }}/targets/{{ target.target_name }}/delete" title="delete target"><span class="glyphicon glyphicon-remove"></span></a>
+                    <a href="{{ baseurl }}/targets/{{ target.target_name }}/test" title="test target"><i class="fa fa-check-square" aria-hidden="true"></i></a>
+                    <a href="{{ baseurl }}/targets/{{ target.target_name }}" title="edit target"><i class="fa fa-pencil-square" aria-hidden="true"></i></a>
+                    <a href="{{ baseurl }}/targets/{{ target.target_name }}/delete" title="delete target"><i class="fa fa-times" aria-hidden="true"></i></a>
                 </td>
             </tr>
         {% endfor %}
 
     </table>
-</div>
 
 {% include 'include/footer.html.tpl' %}

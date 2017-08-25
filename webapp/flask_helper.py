@@ -10,11 +10,13 @@ This module defines helper methods for using with Flask
 import flask
 from config import Config
 
+
 def get_baseurl():
     config = Config()
     baseurl = config.get_value("Webserver", "baseurl", "")
     baseurl = baseurl.replace("%host%", flask.request.headers["Host"])
     return baseurl
+
 
 def redirect(target):
     """helper method: redirect with base url if set"""

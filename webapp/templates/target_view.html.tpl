@@ -1,7 +1,7 @@
 {% include 'include/header.html.tpl' %}
 
 <!-- page navigation -->
-<ul class="nav nav-pills">
+<ul class="breadcrumb pull-right">
     <li role="presentation">
         <a href="{{ baseurl }}/targets"><span class="glyphicon glyphicon-list"></span>List Targets</a>
     </li>
@@ -11,10 +11,9 @@
     </li>
 </ul>
 
-<h1><span class="glyphicon glyphicon-log-out"></span>Target {{ target.target_name }}</h1>
+<h1 class="page-header"><i class="fa fa-sign-in" aria-hidden="true"></i> Target: <small>{{ target.target_name }}</small></h1>
 
-<div class="container">
-    <form method="POST" action="{{ baseurl }}/targets/{{ target.target_name }}/edit">
+    <form id="target_view_form" method="POST" action="{{ baseurl }}/targets/{{ target.target_name }}/edit">
         <div class="form-group">
             <label for="inputClass">Class</label>
             <input type="text" class="form-control" id="inputClass" name="class" value="{{ target.target_class }}" disabled="disabled" />
@@ -27,7 +26,7 @@
             </div>
         {% endfor %}
         <button type="submit" class="btn btn-primary">Save</button>
+        <button form="target_view_form" type="reset" class="btn btn-default">Reset</button>
     </form>
-</div>
 
 {% include 'include/footer.html.tpl' %}

@@ -1,10 +1,8 @@
 {% include 'include/header.html.tpl' %}
 
-<h1>Dashboard</h1>
-
-<div class="container">
-    <h2><span class="glyphicon glyphicon-log-in"></span>Sources</h2>
-    <table class="table table-default">
+    <h1 class="page-header">Dashboard</h1>
+    <h2><i class="fa fa-sign-out" aria-hidden="true"></i> Sources</h2>
+    <table class="table table-default table-striped table-hover">
         <tr>
                 <th>Status</th>
                 <th>Name</th>
@@ -16,24 +14,24 @@
         {% for source in sources %}
             {% if source.source_status == 2 %}
                 <tr class="danger">
-                    <td><span class="glyphicon glyphicon-remove-sign"></span></td>
+                    <td><i class="fa fa-ban" aria-hidden="true"></i></td>
             {% elif source.source_status == 1 %}
                 <tr class="success">
-                    <td><span class="glyphicon glyphicon-ok-sign"></span></td>
+                    <td><i class="fa fa-check-circle" aria-hidden="true"></i></td>
             {% else %}
                 <tr>
                     <td><span class="glyphicon glyphicon-question-sign"></span></td>
             {% endif %}
                     <td>{{ source.source_name }}</td>
-                    <td>{{ source.source_url }}</td>
+                    <td><a href="{{ source.source_url }}" target="_blank">{{ source.source_url }}</a></td>
                     <td>{{ source.source_user }}</td>
                     <td>{{ source.source_filter }}</td>
                 </tr>
         {% endfor %}
     </table>
 
-    <h2><span class="glyphicon glyphicon-random"></span>Forwarding Rules</h2>
-    <table class="table table-default">
+    <h2><i class="fa fa-random" aria-hidden="true"></i> Forwarding Rules</h2>
+    <table class="table table-default table-striped table-hover">
         <tr>
                 <th>Rule</th>
                 <th>Delay [sec]</th>
@@ -50,6 +48,5 @@
         {% endfor %}
     </table>
 
-</div>
 
 {% include 'include/footer.html.tpl' %}

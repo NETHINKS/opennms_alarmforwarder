@@ -1,13 +1,13 @@
 {% include 'include/header.html.tpl' %}
 
 <!-- page navigation -->
-<ul class="nav nav-pills">
+<ul class="breadcrumb pull-right">
     <li role="presentation"><a href="#" data-toggle="modal" data-target="#modalAddRule">
-                                <span class="glyphicon glyphicon-plus"></span>Add Rule
+                                <i class="fa fa-plus-circle" aria-hidden="true"></i> Add Rule
                             </a>
     </li>
     <li role="presentation"><a href="{{ baseurl }}/docs#_forwarding_rules" target="_blank">
-                                <span class="glyphicon glyphicon-question-sign"></span>Help
+                                <i class="fa fa-question-circle" aria-hidden="true"></i> Help
                             </a>
     </li>
 </ul>
@@ -44,15 +44,15 @@
                         </select>
                     </div>
                     <button type="submit" class="btn btn-primary">Submit</button>
+                    <button type="reset" class="btn btn-default">Reset</button>
                 </form>
             </div>
         </div>
     </div>
 </div>
 
-<div class="container">
-    <h1><span class="glyphicon glyphicon-random"></span>Forwarding Rules</h1>
-    <table class="table table-default">
+    <h1 class="page-header"><i class="fa fa-random" aria-hidden="true"></i> Forwarding Rules</h1>
+    <table class="table table-default table-striped table-hover">
         <tr>
                 <th>Rule</th>
                 <th>Delay [sec]</th>
@@ -67,12 +67,11 @@
                 <td>{{ rule.rule_maxforwardings }}</td>
                 <td>{{ rule.rule_target }}</td>
                 <td>
-                    <a href="{{ baseurl }}/rules/{{ rule.rule_id }}" title="edit rule"><span class="glyphicon glyphicon-edit"></span></a>
-                    <a href="{{ baseurl }}/rules/{{ rule.rule_id }}/delete" title="delete rule"><span class="glyphicon glyphicon-remove"></span></a>
+                    <a href="{{ baseurl }}/rules/{{ rule.rule_id }}" title="edit rule"><i class="fa fa-pencil-square" aria-hidden="true"></i></span></a>
+                    <a href="{{ baseurl }}/rules/{{ rule.rule_id }}/delete" title="delete rule"><i class="fa fa-times" aria-hidden="true"></i></a>
                 </td>
             </tr>
         {% endfor %}
     </table>
-</div>
 
 {% include 'include/footer.html.tpl' %}

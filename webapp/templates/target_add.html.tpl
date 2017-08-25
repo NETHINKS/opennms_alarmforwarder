@@ -1,8 +1,7 @@
 {% include 'include/header.html.tpl' %}
 
-<h1>Add new target</h1>
+<h1 class="page-header"><i class="fa fa-plus-circle" aria-hidden="true"></i> Add new target</h1>
 
-<div class="container">
     <form method="POST" action="{{ baseurl }}/targets/add">
         <input type="hidden" name="action" value="add">
         <div class="form-group">
@@ -19,8 +18,7 @@
             <input type="text" class="form-control" id="input{{ parm_name }}" name="{{ parm_name }}" value="{{ target_parameters[parm_name] }}">
         </div>
         {% endfor %}
-        <button type="submit" class="btn btn-default">Submit</button>
+        <button type="submit" class="btn btn-primary">Submit</button>
+        <button type="reset" class="btn btn-default">Reset</button>
     </form>
-</div>
-
 {% include 'include/footer.html.tpl' %}

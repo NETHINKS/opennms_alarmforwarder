@@ -1,5 +1,5 @@
-<nav class="navbar navbar-inverse">
-    <div class="container-fluid">
+<nav class="navbar navbar-fixed-top navbar-default">
+    <div class="container">
         <div class="navbar-header">
             <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse-1" aria-expanded="false">
                 <span class="sr-only">Toggle navigation</span>
@@ -7,63 +7,58 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <h1>
+
                 <a class="navbar-brand" href="{{ baseurl }}/">
-                    <img src="{{ baseurl }}/static/images/logo-small.png" alt="AlarmForwarder Logo" />
-                    AlarmForwarder
+                    <span class="nt-brand" data-char="AF"></span>AlarmForwarder
                 </a>
-            </h1>
+
         </div>
 
         <div class="collapse navbar-collapse navbar-right" id="navbar-collapse-1">
             <ul class="nav navbar-nav">
-                <li><a href="{{ baseurl }}/"><span class="glyphicon glyphicon-dashboard"></span>Overview</a></li>
+                <li class="{% if not current_path %} active{% endif %}"><a href="{{ baseurl }}/"><i class="fa fa-tachometer" aria-hidden="true"></i> Dashboard</a></li>
 
                 <!-- Dropdown: forwarding configuration -->
-                <li class="dropdown">
+                {% set forwarding_items = ["sources", "targets", "rules"] %}
+                <li class="dropdown{% if current_path in forwarding_items %} active{% endif %}">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">
-                        <span class="glyphicon glyphicon-log-out"></span>Forwarding Configuration<span class="caret"></span>
+                        <i class="fa fa-refresh" aria-hidden="true"></i> Forwarding <span class="caret"></span>
                     </a>
                     <ul class="dropdown-menu">
-                        <li><a href="{{ baseurl }}/sources"><span class="glyphicon glyphicon-log-in"></span>Sources</a></li>
-                        <li><a href="{{ baseurl }}/targets"><span class="glyphicon glyphicon-log-out"></span>Targets</a></li>
-                        <li><a href="{{ baseurl }}/rules"><span class="glyphicon glyphicon-random"></span>Forwarding Rules</a></li>
+                        <li>
+                            <a href="{{ baseurl }}/sources" ><i class="fa fa-sign-out" aria-hidden="true"></i> Sources</a>
+                        </li>
+                        <li>
+                            <a href="{{ baseurl }}/targets"><i class="fa fa-sign-in" aria-hidden="true"></i> Targets</a>
+                        </li>
+                        <li>
+                            <a href="{{ baseurl }}/rules"><i class="fa fa-random" aria-hidden="true"></i> Forwarding Rules</a>
+                        </li>
                     </ul>
                 </li>
 
                 <!-- Dropdown: admin -->
-                <li class="dropdown">
+                {% set admin_items = ["admin"] %}
+                <li class="dropdown {% if current_path in admin_items %} active{% endif %}">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">
-                        <span class="glyphicon glyphicon-wrench"></span>Admin<span class="caret"></span>
+                        <i class="fa fa-cog" aria-hidden="true"></i> Admin<span class="caret"></span>
                     </a>
                     <ul class="dropdown-menu">
-                        <li><a href="{{ baseurl }}/admin/users"><span class="glyphicon glyphicon-user"></span>Local Users</a></li>
-                    </ul>
-                </li>
-
-                <!-- Dropdown: help menu -->
-                <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">
-                        <span class="glyphicon glyphicon-question-sign"></span>Help<span class="caret"></span>
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li><a href="{{ baseurl }}/docs" target="_blank"><span class="glyphicon glyphicon-book"></span>Documentation</a></li>
-                        <li><a href="https://github.com/NETHINKS/opennms_alarmforwarder" target="_blank"><span class="glyphicon glyphicon-globe"></span>GitHub Project</a></li>
+                        <li><a href="{{ baseurl }}/admin/users"><i class="fa fa-user" aria-hidden="true"></i> Local Users</a></li>
                     </ul>
                 </li>
 
                 <!-- Dropdown: user menu -->
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">
-                        <span class="glyphicon glyphicon-user"></span>User: {{ session.username }}<span class="caret"></span>
+                        <i class="fa fa-user" aria-hidden="true"></i> User: {{ session.username }}<span class="caret"></span>
                     </a>
                     <ul class="dropdown-menu">
-                        <li><a href="{{ baseurl }}/password-change"><span class="glyphicon glyphicon-cog"></span>Change Password</a></li>
-                        <li><a href="{{ baseurl }}/logout"><span class="glyphicon glyphicon-off"></span>Logout</a></li>
+                        <li><a href="{{ baseurl }}/password-change"><i class="fa fa-exchange" aria-hidden="true"></i> Change Password</a></li>
+                        <li><a href="{{ baseurl }}/logout"><i class="fa fa-times" aria-hidden="true"></i> Logout</a></li>
                     </ul>
                 </li>
             </ul>
         </div>
     </div>
 </nav>
-
