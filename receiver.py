@@ -57,12 +57,11 @@ class OpennmsReceiver(object):
         # get alarms from OpenNMS REST API
         requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
         request_url = config_rest_url + "/alarms?limit=0"
-        request_params = {
-            "limit": 0,
-            "query": config_rest_filter
-        }
+        if config_rest_filter == "":
+            request_url = request_url + "&" + config_rest_filter
+
         try:
-            response = requests.get(request_url, params=request_params, auth=(config_rest_user, config_rest_pw),
+            response = requests.get(request_url, auth=(config_rest_user, config_rest_pw),
                                     verify=False)
         # error handling
         except:

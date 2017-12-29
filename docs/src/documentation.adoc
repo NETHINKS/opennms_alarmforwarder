@@ -321,7 +321,13 @@ A Source is an OpenNMS server. The communication to OpenNMS is done using the Op
   Password of the OpenNMS user, e.g. _demo_
 
 *Filter*::
-  Query filter for getting alarms. You can use all query filters that were described in the OpenNMS Development Guide for the REST Endpoint _/alarms_. If you leave this field empty, no filtering is done.
+  Query filter for getting alarms. You can use all query filters that were described in the OpenNMS Development Guide for the REST Endpoint _/alarms_. If you leave this field empty, no filtering is done. Simply put URL parameters for the OpenNMS alarm REST endpoint in the field. 
+[source]
+----
+alarmAckUser=NULL&stickyMemo=NULL&severity=CLEARED&comperator=gt
+----
+WARNING: Behavior of the Filter parameter has changed in version 1.0.2. Until version 1.0.1, the query filter of the OpenNMS REST API has been used, which is not supported in newer versions anymore.
+
 
 === Targets
 Alarms were forwarded to targets. Targets can also be configured in the AlarmForwarder WebUI. Each target has a unique Name and a Forwarding Class. The Forwarding Class defines the way, how alarms were forwarded. You can find a description of each available class in the following secitions. For each Forwarding Class, specific parameters can be set. 

@@ -982,9 +982,26 @@ systemctl start alarmforwarder.service</code></pre>
 </dd>
 <dt class="hdlist1"><strong>Filter</strong></dt>
 <dd>
-<p>Query filter for getting alarms. You can use all query filters that were described in the OpenNMS Development Guide for the REST Endpoint <em>/alarms</em>. If you leave this field empty, no filtering is done.</p>
+<p>Query filter for getting alarms. You can use all query filters that were described in the OpenNMS Development Guide for the REST Endpoint <em>/alarms</em>. If you leave this field empty, no filtering is done. Simply put URL parameters for the OpenNMS alarm REST endpoint in the field.</p>
 </dd>
 </dl>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight"><code>alarmAckUser=NULL&amp;stickyMemo=NULL&amp;severity=CLEARED&amp;comperator=gt</code></pre>
+</div>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+Behavior of the Filter parameter has changed in version 1.0.2. Until version 1.0.1, the query filter of the OpenNMS REST API has been used, which is not supported in newer versions anymore.
+</td>
+</tr>
+</table>
 </div>
 </div>
 <div class="sect2">
@@ -1463,7 +1480,7 @@ example: alarm_uei~.*nodeDown.*</code></pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-12-27 16:40:49 CET
+Last updated 2017-12-29 15:23:01 CET
 </div>
 </div>
 </body>
